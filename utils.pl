@@ -37,3 +37,6 @@ make_intervals(L, I):-
     isList(L),
     sort(L, S),
     blocks(S, I).
+
+property_of(P, O, V):-
+    member(V:P, O).

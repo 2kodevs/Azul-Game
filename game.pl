@@ -16,7 +16,7 @@ new_round(F):-
     use_fac(D, 9, F).
 
 any_full_rows(P):-
-    member(T:table, P),
+    property_of(table, P, T),
     findall(true, (
         bagof(X, member((_, X), T), Col),
         length(Col, 5)
