@@ -15,19 +15,20 @@ new_round(F):-
     random_permutation(W, D),
     use_fac(D, 9, F).
 
-any_full_rows(P):-
+any_full_row(P, S):-
     property_of(table, P, T),
     findall(true, (
         bagof(X, member((_, X), T), Col),
         length(Col, 5)
     ), Rows),
+    length(Rows, S),
     any(Rows).
 
 ending_condion([], []).
 ending_condion(Data):-
     findall(true, (
         member(X, Data),
-        any_full_rows(X)    
+        any_full_row(X, _)    
     ), P),
     any(P).
 
