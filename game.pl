@@ -30,4 +30,23 @@ ending_condion(Data):-
         any_full_rows(X)    
     ), P),
     any(P).
+
+line_score(L, Tile, S):-
+    make_intervals(L, I),
+    findall(X, (
+        member(X, I),
+        member(Tile, X)    
+    ), [B]),
+    length(B, S).
+    
+tile_score(P, (X, Y), S):-
+    property_of(table, P, T),
+    writeln(T),
+    concat(T, [(X, Y)], N),
+    writeln(N),
+    line_score(N, (X, Y), RS),
+    bagof((A, B), A^member((B, A), N), RN),
+    writeln(RN),
+    line_score(RN, (Y, X), CS),
+    S is RS + CS.
     
