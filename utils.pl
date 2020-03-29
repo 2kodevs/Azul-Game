@@ -19,3 +19,21 @@ isList([_|_]).
 
 any(true).
 any(L) :- isList(L), member(true, L).
+
+consecutive([(X, B) | L], (X, Y), C, R):-
+    B is Y + 1, !,
+    consecutive(L, (X, B), A, R),
+    concat([(X, B)], A, C).
+consecutive(L, _, [], L).
+
+blocks([], []).
+blocks([X | L], I):-
+    consecutive(L, X, C, R),
+    concat([X], C, B),
+    blocks(R, K),  
+    concat([B], K, I).
+
+make_intervals(L, I):-
+    isList(L),
+    sort(L, S),
+    blocks(S, I).
