@@ -18,7 +18,8 @@ isList([]).
 isList([_|_]).
 
 any(true).
-any(L) :- isList(L), member(true, L).
+any(L) :- 
+    isList(L), member(true, L).
 
 consecutive([(X, B) | L], (X, Y), C, R):-
     B is Y + 1, !,
@@ -40,3 +41,11 @@ make_intervals(L, I):-
 
 property_of(P, O, V):-
     member(V:P, O).
+
+invert_axis(L, R):-
+    bagof((Y, X), Y^member((X, Y), L), R).
+
+max(X, Y, Y):-
+    Y >= X, !.
+max(X, Y, X):-
+    X >= Y.
