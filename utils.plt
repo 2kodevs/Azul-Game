@@ -4,7 +4,9 @@
 
 
 test(add) :-
-    add([], 5, red, [red, red, red, red, red]),
-    add([red, red], 3, blue, [red, red, blue, blue, blue]).
+    add([], 5, red, R),
+    assertion(R==[red, red, red, red, red]),
+    add(R, 3, blue, B),
+    assertion(concat(R, [blue, blue, blue], B)).
 
 :- end_tests(utils).
