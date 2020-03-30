@@ -17,6 +17,11 @@ list_print([X | L]):-
 isList([]).
 isList([_|_]).
 
+concat_all([], []).
+concat_all([X | Y], R) :- 
+    concat_all(Y, L),
+    concat(X, L, R).
+
 any(true).
 any(L) :- 
     isList(L), member(true, L).

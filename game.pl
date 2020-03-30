@@ -1,19 +1,38 @@
 % import utils to run this file
 
-use_fac(_, 0, []).
-use_fac([A, B, C, D | L], X, [[A, B, C, D] | R]):-
-    X > 0,
-    X1 is X - 1,
-    use_fac(L, X1, R).
+use_fac(L, [], L).
+use_fac([], _, []).
+use_fac([[] | F], L, [[] | R]):-
+    use_fac(F, L, R).
+use_fac([[_ | A] | F], [X | L], [[X | B] | R]):-
+    use_fac([A | F], L, [B | R]).
 
-new_round(F):-
-    add([], 20, red, A),
-    add(A, 20, blue, B),
-    add(B, 20, yellow, Y),
-    add(Y, 20, grey, G),
-    add(G, 20, white, W),
-    random_permutation(W, D),
-    use_fac(D, 9, F).
+populate(A, F, G, NA):-
+    length(F, V0),
+    findall(X, member(X:_, A), N),
+    sum_list(N, V1), 
+    V1 < V0 * 4, !,
+    property_of(outs, G, M),
+    findall(K:X, (
+        property_of(X, A, V2),
+        property_of(X, M, V3),
+        K is V2 + V3
+    ), NA).
+populate(A, _, _, A).
+
+new_round(G0, NG):-
+    property_of(amounts, G0, GA),
+    property_of(factories, G0, GF),
+    populate(GA, GF, G0, A),
+    findall(L, (
+        member(V:C, A),
+        add([], V, C, L)    
+    ), W),
+    concat_all(W, R),
+    random_permutation(R, D),
+    use_fac(GF, D, F),
+    set_prop_to(amounts, G0, A, G1),
+    set_prop_to(factories, G1, F, NG).
 
 any_full_row(P, S):-
     property_of(table, P, T),
@@ -87,3 +106,27 @@ new_game():-
     add([], 4, empty, E),
     add([], 9, E, F),
     Game = [P:players, A:amounts, O:outs, F:factories],
+    run(Game).
+
+run(G0):-
+    new_round(G0, G1),
+    %TODO: run the round
+    validate(G1).
+
+validate(G0):-
+    ending_condion(G0), !,
+    calculate_scores(G0, _).
+    %TODO: show winner and scores
+validate(G):-
+    run(G).
+
+calculate_scores(G0, G1):-
+    property_of(players, G0, GP),
+    findall(NP, (
+        member(X, GP),
+        table_score(X, TS),
+        property_of(score, X, PS),
+        S is PS + TS,
+        set_prop_to(score, X, S, NP)
+    ), P),
+    set_prop_to(players, G0, P, G1).
