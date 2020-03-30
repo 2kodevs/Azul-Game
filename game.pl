@@ -76,3 +76,14 @@ table_score(P, S):-
     full_rows([RT:table], CS),
     full_colors(P, DS),
     S is RS * 2 + CS * 7 + 10 * DS.
+
+tiles_colors([blue, red, yellow, black, white]).
+
+new_game():-
+    tiles_colors(C),
+    findall(20:X, member(X, C), A),
+    add([], 4, [[]:table, 0:score], P),
+    findall(0:X, member(X, C), O),
+    add([], 4, empty, E),
+    add([], 9, E, F),
+    Game = [P:players, A:amounts, O:outs, F:factories],
