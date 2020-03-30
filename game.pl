@@ -14,3 +14,65 @@ new_round(F):-
     add(G, 20, white, W),
     random_permutation(W, D),
     use_fac(D, 9, F).
+
+any_full_row(P, S):-
+    property_of(table, P, T),
+    findall(true, (
+        bagof(X, member((_, X), T), Col),
+        length(Col, 5)
+    ), Rows),
+    length(Rows, S),
+    any(Rows).
+
+ending_condion([], []).
+ending_condion(Data):-
+    findall(true, (
+        member(X, Data),
+        any_full_row(X, _)    
+    ), P),
+    any(P).
+
+line_score(L, Tile, S):-
+    make_intervals(L, I),
+    findall(X, (
+        member(X, I),
+        member(Tile, X)    
+    ), [B]),
+    length(B, S).
+    
+tile_score(P, (X, Y), S):-
+    property_of(table, P, T),
+    concat(T, [(X, Y)], N),
+    line_score(N, (X, Y), RS),
+    invert_axis(N, RN),
+    line_score(RN, (Y, X), CS),
+    S is RS + CS.
+    
+full_rows(P, S):- 
+    any_full_row(P, S), !.
+full_rows(_, 0).
+
+cascade((5, Y), L):-
+    member((5, Y), L).
+cascade((X, Y), L):-
+    member((X, Y), L),
+    NX is X + 1,
+    Y1 is (Y + 1) mod 6,
+    max(Y1, 1, NY),
+    cascade((NX, NY), L).
+
+full_colors(P, S):-
+    property_of(table, P, T),
+    findall(true, (
+        member((1, X), T),
+        cascade((1, X), T)
+    ), L),
+    length(L, S).    
+
+table_score(P, S):-
+    full_rows(P, RS),
+    property_of(table, P, T),
+    invert_axis(T, RT),
+    full_rows([RT:table], CS),
+    full_colors(P, DS),
+    S is RS * 2 + CS * 7 + 10 * DS.
