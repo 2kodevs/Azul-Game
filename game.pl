@@ -1,4 +1,4 @@
-% import utils to run this file
+:- [utils].
 
 use_fac(L, [], L).
 use_fac([], _, []).
