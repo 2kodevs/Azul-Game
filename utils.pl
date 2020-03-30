@@ -42,8 +42,23 @@ make_intervals(L, I):-
 property_of(P, O, V):-
     member(V:P, O).
 
+get_value_or_default(P, O, V, _):-
+    property_of(P, O, V), !.
+get_value_or_default(_, _, D, D).
+
+remove_prop(_, [], []).
+remove_prop(P, [(_:P) | R], L):-
+    !, remove_prop(P, R, L). 
+remove_prop(P, [(X:Y) | R], [(X:Y) | L]):-
+    Y \= P,
+    remove_prop(P, R, L).
+
+set_prop_to(P, O, V, N):-
+    remove_prop(P, O, C),
+    concat([V:P], C, N).
+
 invert_axis(L, R):-
-    bagof((Y, X), Y^member((X, Y), L), R).
+    findall((Y, X), member((X, Y), L), R).
 
 max(X, Y, Y):-
     Y >= X, !.
