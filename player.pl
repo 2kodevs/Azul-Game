@@ -67,8 +67,9 @@ update_score(Player, (L, C), NewPlayer):-
     tile_score(Player, (L, C), Score),
     property_of(score, Player, PScore),
     Sum is Score + PScore,
-    set_prop_to(score, Player, Sum, NewPlayer).
-update_score(P, _, _, P).
+    update_table(Player, (L, C), CurPlayer),
+    set_prop_to(score, CurPlayer, Sum, NewPlayer).
+update_score(P, _, P).
 
 update_line(Player, Game, L:F:Color, NewPlayer, Dif):-    
     property_of(factories, Game, Factories),
@@ -109,8 +110,7 @@ update_player(Player, Game, L:F:Color, NewPlayer):-
     update_line(Player, Game, L:F:Color, TempPlayer0, Diff),   
     column_of(L, Color, C),
     update_score(TempPlayer0, (L, C), TempPlayer1),
-    update_table(TempPlayer1, (L, C), TempPlayer2),
-    penalize(TempPlayer2, Diff, NewPlayer).
+    penalize(TempPlayer1, Diff, NewPlayer).
 
 update_game(Game, _:F:C, NewGame):-
     property_of(factories, Game, GameFac),
