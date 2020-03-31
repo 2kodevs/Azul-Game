@@ -1,4 +1,4 @@
-:- [utils].
+:- [utils, player].
 
 use_fac(L, [], L).
 use_fac([], _, []).
@@ -56,22 +56,6 @@ ending_condion(Data):-
         any_full_row(X, _)    
     ), P),
     any(P).
-
-line_score(L, Tile, S):-
-    make_intervals(L, I),
-    findall(X, (
-        member(X, I),
-        member(Tile, X)    
-    ), [B]),
-    length(B, S).
-    
-tile_score(P, (X, Y), S):-
-    property_of(table, P, T),
-    concat(T, [(X, Y)], N),
-    line_score(N, (X, Y), RS),
-    invert_axis(N, RN),
-    line_score(RN, (Y, X), CS),
-    S is RS + CS.
     
 full_rows(P, S):- 
     any_full_row(P, S), !.
@@ -101,8 +85,6 @@ table_score(P, S):-
     full_rows([RT:table], CS),
     full_colors(P, DS),
     S is RS * 2 + CS * 7 + 10 * DS.
-
-tiles_colors([blue, red, yellow, black, white]).
 
 new_game(Game):-
     tiles_colors(C),

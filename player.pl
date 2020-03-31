@@ -1,6 +1,22 @@
-:- [utils, game].
+:- [utils].
 
-penalization_list([-1, -1, -2, -2, -2, -3, -3]).
+penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
+
+line_score(L, Tile, S):-
+    make_intervals(L, I),
+    findall(X, (
+        member(X, I),
+        member(Tile, X)    
+    ), [B]),
+    length(B, S).
+    
+tile_score(P, (X, Y), S):-
+    property_of(table, P, T),
+    concat(T, [(X, Y)], N),
+    line_score(N, (X, Y), RS),
+    invert_axis(N, RN),
+    line_score(RN, (Y, X), CS),
+    S is RS + CS.
 
 column_of(Line, Color, Column):-
     tiles_colors(Colors),

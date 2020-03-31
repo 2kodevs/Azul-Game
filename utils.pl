@@ -1,3 +1,5 @@
+tiles_colors([blue, red, yellow, black, white]).
+
 concat([], X, X).
 concat([X | R], Y, [X | Z]) :- 
     concat(R, Y, Z).
