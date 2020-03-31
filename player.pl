@@ -31,3 +31,14 @@ clean_line(Player, L, NewPlayer):-
     set_prop_to(stocks, TempLine1, Stocks, TempLine2),
     set_prop_to(L, Board, TempLine2, NewBoard),
     set_prop_to(board, Player, NewBoard, NewPlayer).
+
+update_score(Player, (L, C), NewPlayer):-
+    property_of(board, Player, Board),
+    property_of(L, Board, Line),
+    property_of(stocks, Line, Stocks),
+    count(Stocks, empty, 0), !,
+    tile_score(Player, (L, C), Score),
+    property_of(score, Player, PScore),
+    Sum is Score + PScore,
+    set_prop_to(score, Player, Sum, NewPlayer).
+update_score(P, _, _, P).
