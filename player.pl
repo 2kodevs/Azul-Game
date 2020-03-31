@@ -97,4 +97,4 @@ update_game(Game, _:F:C, NewGame):-
 basic(Game, Player, NewGame, NewPlayer):-
     valid_choices(Game, Player, [A | _]),
     update_player(Player, Game, A, NewPlayer),
-    update_game(Game, A, NewGame),
+    update_game(Game, A, NewGame).
