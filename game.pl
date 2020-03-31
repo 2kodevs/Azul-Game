@@ -1,4 +1,4 @@
-:- [utils, player].
+:- [player].
 
 use_fac(L, [], L).
 use_fac([], _, []).
@@ -23,7 +23,7 @@ populate(G0, NG):-
     set_prop_to(amounts, G0, NA, G1),
     findall(0:X, member(_:X, M), NO),
     set_prop_to(outs, G1, NO, NG).
-populate(A, _, _, A).
+populate(G, G).
 
 new_round(G0, NG):-
     populate(G0, G1),
