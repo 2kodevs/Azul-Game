@@ -57,3 +57,8 @@ update_line(Player, Game, L:F:Color, NewPlayer, Dif):-
     set_prop_to(valid, NewLine, [Color], ValidLine),
     set_prop_to(L, Board, ValidLine, NewBoard),
     set_prop_to(board, Player, NewBoard, NewPlayer).
+
+update_table(Player, Tile, NewPlayer):-
+    property_of(table, Player, Table),
+    add(Table, 1, Tile, NewTable),
+    set_prop_to(table, Player, NewTable, NewPlayer).
