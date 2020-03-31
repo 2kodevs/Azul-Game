@@ -98,3 +98,19 @@ basic(Game, Player, NewGame, NewPlayer):-
     valid_choices(Game, Player, [A | _]),
     update_player(Player, Game, A, NewPlayer),
     update_game(Game, A, NewGame),
+
+empty_board(Data:board):-
+    add([], 5, 1, List),
+    enumerate(List, 1, Enum),
+    tiles_colors(C),
+    findall([New:stocks, C:valid, C:all]:Sz, (
+        property_of(Sz, Enum, _),
+        add([], Sz, empty, New)    
+    ), Data).
+
+new_players(Amount, Players:players):-
+    empty_board(Board),
+    penalization_list(Penalties),
+    add([], Amount, 
+        [Board, Penalties, []:table, []:score],
+    Players).
