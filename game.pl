@@ -7,31 +7,37 @@ use_fac([[] | F], L, [[] | R]):-
 use_fac([[_ | A] | F], [X | L], [[X | B] | R]):-
     use_fac([A | F], L, [B | R]).
 
-populate(A, F, G, NA):-
+populate(G0, NG):-
+    property_of(amounts, G0, A),
+    property_of(factories, G0, F),
     length(F, V0),
     findall(X, member(X:_, A), N),
     sum_list(N, V1), 
     V1 < V0 * 4, !,
-    property_of(outs, G, M),
+    property_of(outs, G0, M),
     findall(K:X, (
         property_of(X, A, V2),
         property_of(X, M, V3),
         K is V2 + V3
-    ), NA).
+    ), NA),
+    set_prop_to(amounts, G0, NA, G1),
+    findall(0:X, member(_:X, M), NO),
+    set_prop_to(outs, G1, NO, NG).
 populate(A, _, _, A).
 
 new_round(G0, NG):-
-    property_of(amounts, G0, GA),
-    property_of(factories, G0, GF),
-    populate(GA, GF, G0, A),
+    populate(G0, G1),
+    property_of(amounts, G1, A),
     findall(L, (
         member(V:C, A),
         add([], V, C, L)    
     ), W),
     concat_all(W, R),
     random_permutation(R, D),
-    use_fac(GF, D, F),
-    set_prop_to(amounts, G0, A, G1),
+    property_of(factories, G1, GF),
+    findall(X, member(X:_, GF), Z),
+    use_fac(Z, D, Q),
+    enumerate(Q, 1, F),
     set_prop_to(factories, G1, F, NG).
 
 any_full_row(P, S):-
@@ -98,14 +104,15 @@ table_score(P, S):-
 
 tiles_colors([blue, red, yellow, black, white]).
 
-new_game():-
+new_game(Game):-
     tiles_colors(C),
+    new_players(4, P),
     findall(20:X, member(X, C), A),
-    add([], 4, [[]:table, 0:score], P),
     findall(0:X, member(X, C), O),
     add([], 4, empty, E),
-    add([], 9, E, F),
-    Game = [P:players, A:amounts, O:outs, F:factories],
+    add([], 9, E, EF),
+    enumerate(EF, 1, F),
+    Game = [P, A:amounts, O:outs, F:factories],
     run(Game).
 
 run(G0):-
