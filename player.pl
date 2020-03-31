@@ -95,6 +95,22 @@ update_game(Game, _:F:C, NewGame):-
     set_prop_to(factories, Game, NewFacs, NewGame).
 
 basic(Game, Player, NewGame, NewPlayer):-
-    valid_choices(Game, Player, [A | _]),
+    valid_choices(Game, Player, [A | _]), !,
     update_player(Player, Game, A, NewPlayer),
     update_game(Game, A, NewGame).
+basic(Game, Player, NewGame, NewPlayer):-
+    property_of(factories, Game, Factories),
+    findall(X:Id, (
+        property_of(Id, Factories, X),
+        count(X, empty, C),
+        C \= 4    
+    ), [F:Fid | _]), !,
+    member(Color, F),
+    Color \= empty, !,
+    count(F, Color, Amount),
+    replace(F, 4, Color, empty, NewF),
+    set_prop_to(Fid, Factories, NewF, NewFactories),
+    set_prop_to(factories, Game, NewFactories, NewGame),
+    Neg is Amount * -1,
+    penalize(Player, Neg, NewPlayer).
+basic(Game, Player, Game, Player).
