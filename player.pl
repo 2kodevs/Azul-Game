@@ -75,3 +75,8 @@ update_game(Game, _:F:C, NewGame):-
     replace(Fac, 4, C, empty, NewFac),
     set_prop_to(F, GameFac, NewFac, NewFacs),
     set_prop_to(factories, Game, NewFacs, NewGame).
+
+basic(Game, Player, NewGame, NewPlayer):-
+    valid_choices(Game, Player, [A | _]),
+    update_player(Player, Game, A, NewPlayer),
+    update_game(Game, A, NewGame),
