@@ -17,3 +17,17 @@ valid_choices(Game, Player, C):-
         member(Color, ValidColors),
         member(Color, CurFac)
     ), C).
+
+clean_line(Player, L, NewPlayer):-
+    property_of(board, Player, Board),
+    property_of(L, Board, Line),
+    property_of(all, Line, Colors),
+    property_of(valid, Line, [C]),
+    concat(A, [C | B], Colors),
+    concat(A, B, List),
+    set_prop_to(all, Line, List, TempLine0),
+    set_prop_to(valid, TempLine0, List, TempLine1),
+    add([], L, empty, Stocks),
+    set_prop_to(stocks, TempLine1, Stocks, TempLine2),
+    set_prop_to(L, Board, TempLine2, NewBoard),
+    set_prop_to(board, Player, NewBoard, NewPlayer).
