@@ -42,3 +42,18 @@ update_score(Player, (L, C), NewPlayer):-
     Sum is Score + PScore,
     set_prop_to(score, Player, Sum, NewPlayer).
 update_score(P, _, _, P).
+
+update_line(Player, Game, L:F:Color, NewPlayer, Dif):-    
+    property_of(factories, Game, Factories),
+    property_of(F, Factories, Fac),
+    property_of(board, Player, Board),
+    property_of(L, Board, Line),
+    property_of(stocks, Line, Stocks),
+    count(Stocks, empty, Empty),
+    count(Fac, Color, Amount), 
+    Dif is Empty - Amount,
+    replace(Stocks, Amount, empty, Color, NewStocks),
+    set_prop_to(stocks, Line, NewStocks, NewLine),
+    set_prop_to(valid, NewLine, [Color], ValidLine),
+    set_prop_to(L, Board, ValidLine, NewBoard),
+    set_prop_to(board, Player, NewBoard, NewPlayer).
