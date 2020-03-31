@@ -2,6 +2,13 @@
 
 penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 
+% Update the list inside the method
+% to add more strategies.
+random_strategy(S):-
+    random_permutation(
+        [basic],
+    [S | _]).    
+
 line_score(L, Tile, S):-
     make_intervals(L, I),
     findall(X, (
@@ -128,6 +135,11 @@ new_players(Amount, Players:players):-
     empty_board(Board),
     penalization_list(Penalties),
     add([], Amount, 
-        [Board, Penalties, []:table, []:score],
+        [Board, Penalties, []:table, 0:score],
     List),
-    enumerate(List, 1, Players).
+    findall(P, (
+        member(X, List),
+        random_strategy(S),
+        set_prop_to(strategy, X, S, P)    
+    ), RawPlayers),
+    enumerate(RawPlayers, 1, Players).
