@@ -68,3 +68,10 @@ update_player(Player, Game, L:F:Color, NewPlayer):-
     column_of(L, Color, C),
     update_score(TempPlayer0, (L, C), TempPlayer1),
     update_table(TempPlayer1, (L, C), NewPlayer).
+
+update_game(Game, _:F:C, NewGame):-
+    property_of(factories, Game, GameFac),
+    property_of(F, GameFac, Fac),
+    replace(Fac, 4, C, empty, NewFac),
+    set_prop_to(F, GameFac, NewFac, NewFacs),
+    set_prop_to(factories, Game, NewFacs, NewGame).
