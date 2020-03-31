@@ -50,9 +50,10 @@ any_full_row(P, S):-
     any(Rows).
 
 ending_condion([], []).
-ending_condion(Data):-
+ending_condion(Game):-
+    property_of(players, Game, P),
     findall(true, (
-        member(X, Data),
+        member(X:_, P),
         any_full_row(X, _)    
     ), P),
     any(P).
@@ -111,8 +112,8 @@ validate(G):-
 
 calculate_scores(G0, G1):-
     property_of(players, G0, GP),
-    findall(NP, (
-        member(X, GP),
+    findall(NP:Id, (
+        member(X:Id, GP),
         table_score(X, TS),
         property_of(score, X, PS),
         S is PS + TS,

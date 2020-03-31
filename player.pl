@@ -129,4 +129,5 @@ new_players(Amount, Players:players):-
     penalization_list(Penalties),
     add([], Amount, 
         [Board, Penalties, []:table, []:score],
-    Players).
+    List),
+    enumerate(List, 1, Players).
