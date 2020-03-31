@@ -49,14 +49,10 @@ any_full_row(P, S):-
     length(Rows, S),
     any(Rows).
 
-ending_condion([], []).
 ending_condion(Game):-
     property_of(players, Game, P),
-    findall(true, (
-        member(X:_, P),
-        any_full_row(X, _)    
-    ), P),
-    any(P).
+    member(X:_, P),
+    any_full_row(X, _).
     
 full_rows(P, S):- 
     any_full_row(P, S), !.
