@@ -87,3 +87,8 @@ index_of(V, L, I):-
 count(L, V, R):-
     findall(1, member(V, L), K),
     length(K, R).   
+
+enumerate([], _, []).
+enumerate([E1 | List], Number, [E1:Number | Enum]):-
+    Next is Number + 1,
+    enumerate(List, Next, Enum).
