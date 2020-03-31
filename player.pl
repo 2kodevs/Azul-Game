@@ -1,5 +1,7 @@
 :- [utils, game].
 
+penalization_list([-1, -1, -2, -2, -2, -3, -3]).
+
 column_of(Line, Color, Column):-
     tiles_colors(Colors),
     index_of(Color, Colors, Idx),
@@ -63,11 +65,27 @@ update_table(Player, Tile, NewPlayer):-
     add(Table, 1, Tile, NewTable),
     set_prop_to(table, Player, NewTable, NewPlayer).
 
+penalize(Player, Amount, NewPlayer):-
+    Amount < 0,
+    property_of(penalties, Player, Penalties),
+    length(Penalties, Sz),
+    Sz > 0, !,
+    concat([P1], R, Penalties),
+    set_prop_to(penalties, Player, R, TempPlayer1),
+    property_of(score, Player, Score),
+    Sum is Score + P1,
+    max(Sum, 0, NewScore),
+    set_prop_to(score, TempPlayer1, NewScore, TempPlayer2),
+    Times is Amount + 1,
+    penalize(TempPlayer2, Times, NewPlayer).
+penalize(Player, _, Player).    
+
 update_player(Player, Game, L:F:Color, NewPlayer):-
-    update_line(Player, Game, L:F:Color, TempPlayer0, _),   
+    update_line(Player, Game, L:F:Color, TempPlayer0, Diff),   
     column_of(L, Color, C),
     update_score(TempPlayer0, (L, C), TempPlayer1),
-    update_table(TempPlayer1, (L, C), NewPlayer).
+    update_table(TempPlayer1, (L, C), TempPlayer2),
+    penalize(TempPlayer2, Diff, NewPlayer).
 
 update_game(Game, _:F:C, NewGame):-
     property_of(factories, Game, GameFac),
