@@ -83,16 +83,14 @@ table_score(P, S):-
     full_colors(P, DS),
     S is RS * 2 + CS * 7 + 10 * DS.
 
-new_game(Game):-
+new_game([P, A:amounts, O:outs, F:factories]):-
     tiles_colors(C),
     new_players(4, P),
     findall(20:X, member(X, C), A),
     findall(0:X, member(X, C), O),
     add([], 4, empty, E),
     add([], 9, E, EF),
-    enumerate(EF, 1, F),
-    Game = [P, A:amounts, O:outs, F:factories],
-    run(Game).
+    enumerate(EF, 1, F).
 
 run(G0):-
     new_round(G0, G1),
