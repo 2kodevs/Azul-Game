@@ -161,3 +161,13 @@ new_players(Amount, Players:players):-
         set_prop_to(strategy, X, S, P)    
     ), RawPlayers),
     enumerate(RawPlayers, 1, Players).
+
+run_round(G, [], G).
+run_round(Game, [P1:Id | Players], NewGame):-
+    property_of(strategy, P1, St),
+    Choice =.. [St, Game, P1, TempGame1, NewP1],
+    Choice,
+    property_of(players, TempGame1, OldPlayers),
+    set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
+    set_prop_to(players, TempGame1, CurPlayers, TempGame2),    
+    run_round(TempGame2, Players, NewGame).
