@@ -92,17 +92,30 @@ new_game([P, A:amounts, O:outs, F:factories]):-
     add([], 9, E, EF),
     enumerate(EF, 1, F).
 
-run(G0):-
-    new_round(G0, G1),
-    %TODO: run the round
-    validate(G1).
+run(G0, NG):-
+    property_of(players, G0, P),
+    run_round(G0, P, G1),
+    validate(G1, NG).
 
-validate(G0):-
+validate(G0, NG):-
+    property_of(factories, G0, F),
+    findall(X, member(X:_, F), L),
+    concat_all(L, R),
+    length(R, Sz),
+    count(R, empty, Sz), !,
+    clean_players(G0, G1),
+    end_or_continue(G1, NG).
+validate(G0, NG):-
+    run(G0, NG).
+
+end_or_continue(G0, NG):-
     ending_condion(G0), !,
-    calculate_scores(G0, _).
+    calculate_scores(G0, NG).
     %TODO: show winner and scores
-validate(G):-
-    run(G).
+end_or_continue(G0, NG):-
+    new_round(G0, G1),
+    run(G1, NG).
+
 
 calculate_scores(G0, G1):-
     property_of(players, G0, GP),
@@ -114,3 +127,9 @@ calculate_scores(G0, G1):-
         set_prop_to(score, X, S, NP)
     ), P),
     set_prop_to(players, G0, P, G1).
+
+main :-
+    new_game(G0), 
+    new_round(G0, G1),
+    run(G1, _). 
+    % TODO: Print the winner

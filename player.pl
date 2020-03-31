@@ -171,3 +171,19 @@ run_round(Game, [P1:Id | Players], NewGame):-
     set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),    
     run_round(TempGame2, Players, NewGame).
+
+clean_players(Game, NewGame):-
+    property_of(players, Game, Players),
+    findall(Player:Id, (
+        member(X:Id, Players),
+        property_of(board, X, Board),
+        verify_lines(X, Board, Player)
+    ), NewPlayers),
+    set_prop_to(players, Game, NewPlayers, NewGame).
+
+verify_lines(P, [], P).
+verify_lines(Player, [_:Line | Lines], NewPlayer):-
+    clean_line(Player, Line, CurPlayer), !,
+    verify_lines(CurPlayer, Lines, NewPlayer).
+verify_lines(Player, [_ | Lines], NewPlayer):-
+    verify_lines(Player, Lines, NewPlayer).
