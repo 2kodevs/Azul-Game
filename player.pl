@@ -62,3 +62,9 @@ update_table(Player, Tile, NewPlayer):-
     property_of(table, Player, Table),
     add(Table, 1, Tile, NewTable),
     set_prop_to(table, Player, NewTable, NewPlayer).
+
+update_player(Player, Game, L:F:Color, NewPlayer):-
+    update_line(Player, Game, L:F:Color, TempPlayer0, _),   
+    column_of(L, Color, C),
+    update_score(TempPlayer0, (L, C), TempPlayer1),
+    update_table(TempPlayer1, (L, C), NewPlayer).
