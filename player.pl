@@ -48,6 +48,8 @@ clean_line(Player, L, NewPlayer):-
     property_of(L, Board, Line),
     property_of(all, Line, Colors),
     property_of(valid, Line, [C]),
+    property_of(stocks, Line, CurStocks),
+    add([], L, C, CurStocks),
     concat(A, [C | B], Colors),
     concat(A, B, List),
     set_prop_to(all, Line, List, TempLine0),
