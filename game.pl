@@ -34,7 +34,8 @@ new_round(G0, NG):-
     ), W),
     concat_all(W, R),
     random_permutation(R, D),
-    property_of(factories, G1, GF),
+    property_of(factories, G1, AF),
+    remove_prop(center, AF, GF),
     findall(X, member(X:_, GF), Z),
     use_fac(Z, D, Q),
     concat_all(Q, S),
@@ -44,7 +45,8 @@ new_round(G0, NG):-
         V is Cur - K
     ), NA),
     set_prop_to(amounts, G1, NA, G2),
-    enumerate(Q, 1, F),
+    enumerate(Q, 1, NF),
+    set_prop_to(center, NF, [], F),
     set_prop_to(factories, G2, F, NG).
 
 any_full_row(P, S):-
@@ -96,12 +98,26 @@ new_game([P, A:amounts, O:outs, F:factories]):-
     findall(0:X, member(X, C), O),
     add([], 4, empty, E),
     add([], 9, E, EF),
-    enumerate(EF, 1, F).
+    enumerate(EF, 1, NF),
+    set_prop_to(center, NF, [], F).
+
+order_players(G0, E, NG):-
+    property_of(players, G0, P0),
+    indexed_sort(P0, P1),
+    sort_players(P1, E, P2),
+    set_prop_to(players, G0, P2, NG).
+
+sort_players(P0, E, NP):-
+    property_of(center, E, Pid), !,
+    concat(A, [V:Pid | B], P0),
+    concat([V:Pid | B], A, NP).
+sort_players(P, _, P).
 
 run(G0, NG):-
     property_of(players, G0, P),
-    run_round(G0, P, G1),
-    validate(G1, NG).
+    run_round(G0, P, G1, E),
+    order_players(G1, E, G2),
+    validate(G2, NG).
 
 validate(G0, NG):-
     property_of(factories, G0, F),
@@ -121,7 +137,6 @@ end_or_continue(G0, NG):-
 end_or_continue(G0, NG):-
     new_round(G0, G1),
     run(G1, NG).
-
 
 calculate_scores(G0, G1):-
     property_of(players, G0, GP),

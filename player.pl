@@ -116,8 +116,15 @@ update_player(Player, Game, L:F:Color, NewPlayer, Return):-
 update_game(Game, _:F:C, NewGame, ReturnedTiles):-
     property_of(factories, Game, GameFac),
     property_of(F, GameFac, Fac),
-    replace(Fac, 4, C, empty, NewFac),
-    set_prop_to(F, GameFac, NewFac, NewFacs),
+    findall(X, (
+        member(X, Fac),
+        not(member(X, [empty, C]))    
+    ), ToCenter),
+    add([], 4, empty, NewFac),
+    set_prop_to(F, GameFac, NewFac, TempFacs),
+    property_of(center, TempFacs, Center),    
+    concat(ToCenter, Center, NewCenter),
+    set_prop_to(center, TempFacs, NewCenter, NewFacs),
     set_prop_to(factories, Game, NewFacs, Temp),
     property_of(outs, Game, Outs),
     property_of(C, Outs, Number),
@@ -125,20 +132,21 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles):-
     set_prop_to(C, Outs, Sum, NewOuts),
     set_prop_to(outs, Temp, NewOuts, NewGame).
 
-basic(Game, Player, NewGame, NewPlayer):-
+basic(Game, Player, NewGame, NewPlayer, A):-
     valid_choices(Game, Player, [A | _]), !,
     update_player(Player, Game, A, NewPlayer, Return),
     update_game(Game, A, NewGame, Return).
-basic(Game, Player, NewGame, NewPlayer):-
+basic(Game, Player, NewGame, NewPlayer, none:Id:Color):-
     property_of(factories, Game, Factories),
     property_of(Id, Factories, F),
-    count(F, empty, C), C \= 4,
+    count(F, empty, C),
+    not(length(F, C)),
     member(Color, F), Color \= empty, !,
     count(F, Color, Amount),
-    update_game(Game, 1:Id:Color, NewGame, Amount),
+    update_game(Game, none:Id:Color, NewGame, Amount),
     Neg is Amount * -1,
     penalize(Player, Neg, NewPlayer).
-basic(Game, Player, Game, Player).
+basic(Game, Player, Game, Player, none:none:none).
 
 empty_board(Data:board):-
     add([], 5, 1, List),
@@ -162,15 +170,15 @@ new_players(Amount, Players:players):-
     ), RawPlayers),
     enumerate(RawPlayers, 1, Players).
 
-run_round(G, [], G).
-run_round(Game, [P1:Id | Players], NewGame):-
+run_round(G, [], G, []).
+run_round(Game, [P1:Id | Players], NewGame, [Id:Fid | Events]):-
     property_of(strategy, P1, St),
-    Choice =.. [St, Game, P1, TempGame1, NewP1],
+    Choice =.. [St, Game, P1, TempGame1, NewP1, _:Fid:_],
     Choice,
     property_of(players, TempGame1, OldPlayers),
     set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),    
-    run_round(TempGame2, Players, NewGame).
+    run_round(TempGame2, Players, NewGame, Events).
 
 clean_players(Game, NewGame):-
     property_of(players, Game, Players),
