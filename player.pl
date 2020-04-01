@@ -79,7 +79,7 @@ update_line(Player, Game, L:F:Color, NewPlayer, Dif):-
     property_of(stocks, Line, Stocks),
     count(Stocks, empty, Empty),
     count(Fac, Color, Amount), 
-    Dif is Empty - Amount,
+    Diff is min(Empty - Amount, 0),
     replace(Stocks, Amount, empty, Color, NewStocks),
     set_prop_to(stocks, Line, NewStocks, NewLine),
     set_prop_to(valid, NewLine, [Color], ValidLine),

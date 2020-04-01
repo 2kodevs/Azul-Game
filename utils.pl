@@ -67,11 +67,6 @@ set_prop_to(P, O, V, N):-
 invert_axis(L, R):-
     findall((Y, X), member((X, Y), L), R).
 
-max(X, Y, Y):-
-    Y >= X, !.
-max(X, Y, X):-
-    X >= Y.
-
 replace(L, 0, _, _, L):- !.
 replace(L, _, V, _, L):-
     not(member(V, L)), !.

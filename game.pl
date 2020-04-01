@@ -63,8 +63,7 @@ cascade((5, Y), L):-
 cascade((X, Y), L):-
     member((X, Y), L),
     NX is X + 1,
-    Y1 is (Y + 1) mod 6,
-    max(Y1, 1, NY),
+    NY is max((Y + 1) mod 6, 1),
     cascade((NX, NY), L).
 
 full_colors(P, S):-
