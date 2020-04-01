@@ -59,19 +59,20 @@ clean_line(Player, L, NewPlayer):-
     set_prop_to(L, Board, TempLine2, NewBoard),
     set_prop_to(board, Player, NewBoard, NewPlayer).
 
-update_score(Player, (L, C), NewPlayer):-
+update_score(Player, (L, C), NewPlayer, Return):-
     property_of(board, Player, Board),
     property_of(L, Board, Line),
     property_of(stocks, Line, Stocks),
     count(Stocks, empty, 0), !,
+    Return is L - 1,
     tile_score(Player, (L, C), Score),
     property_of(score, Player, PScore),
     Sum is Score + PScore,
     update_table(Player, (L, C), CurPlayer),
     set_prop_to(score, CurPlayer, Sum, NewPlayer).
-update_score(P, _, P).
+update_score(P, _, P, 0).
 
-update_line(Player, Game, L:F:Color, NewPlayer, Dif):-    
+update_line(Player, Game, L:F:Color, NewPlayer, Diff):-    
     property_of(factories, Game, Factories),
     property_of(F, Factories, Fac),
     property_of(board, Player, Board),
@@ -99,25 +100,30 @@ penalize(Player, Amount, NewPlayer):-
     concat([P1], R, Penalties),
     set_prop_to(penalties, Player, R, TempPlayer1),
     property_of(score, Player, Score),
-    Sum is Score + P1,
-    max(Sum, 0, NewScore),
+    NewScore is max(Score + P1, 0),
     set_prop_to(score, TempPlayer1, NewScore, TempPlayer2),
     Times is Amount + 1,
     penalize(TempPlayer2, Times, NewPlayer).
 penalize(Player, _, Player).    
 
-update_player(Player, Game, L:F:Color, NewPlayer):-
+update_player(Player, Game, L:F:Color, NewPlayer, Return):-
     update_line(Player, Game, L:F:Color, TempPlayer0, Diff),   
     column_of(L, Color, C),
-    update_score(TempPlayer0, (L, C), TempPlayer1),
+    update_score(TempPlayer0, (L, C), TempPlayer1, Amount),
+    Return is Amount - Diff,
     penalize(TempPlayer1, Diff, NewPlayer).
 
-update_game(Game, _:F:C, NewGame):-
+update_game(Game, _:F:C, NewGame, ReturnedTiles):-
     property_of(factories, Game, GameFac),
     property_of(F, GameFac, Fac),
     replace(Fac, 4, C, empty, NewFac),
     set_prop_to(F, GameFac, NewFac, NewFacs),
-    set_prop_to(factories, Game, NewFacs, NewGame).
+    set_prop_to(factories, Game, NewFacs, Temp),
+    property_of(outs, Game, Outs),
+    property_of(C, Outs, Number),
+    Sum is Number + ReturnedTiles,
+    set_prop_to(C, Outs, Sum, NewOuts),
+    set_prop_to(outs, Temp, NewOuts, NewGame).
 
 basic(Game, Player, NewGame, NewPlayer):-
     valid_choices(Game, Player, [A | _]), !,

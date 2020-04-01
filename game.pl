@@ -37,8 +37,15 @@ new_round(G0, NG):-
     property_of(factories, G1, GF),
     findall(X, member(X:_, GF), Z),
     use_fac(Z, D, Q),
+    concat_all(Q, S),
+    findall(V:C, (
+        member(Cur:C, A),
+        count(S, C, K),
+        V is Cur - K
+    ), NA),
+    set_prop_to(amounts, G1, NA, G2),
     enumerate(Q, 1, F),
-    set_prop_to(factories, G1, F, NG).
+    set_prop_to(factories, G2, F, NG).
 
 any_full_row(P, S):-
     property_of(table, P, T),
