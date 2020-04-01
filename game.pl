@@ -1,4 +1,4 @@
-:- [utils].
+:- [player].
 
 use_fac(L, [], L).
 use_fac([], _, []).
@@ -7,32 +7,45 @@ use_fac([[] | F], L, [[] | R]):-
 use_fac([[_ | A] | F], [X | L], [[X | B] | R]):-
     use_fac([A | F], L, [B | R]).
 
-populate(A, F, G, NA):-
+populate(G0, NG):-
+    property_of(amounts, G0, A),
+    property_of(factories, G0, F),
     length(F, V0),
     findall(X, member(X:_, A), N),
     sum_list(N, V1), 
     V1 < V0 * 4, !,
-    property_of(outs, G, M),
+    property_of(outs, G0, M),
     findall(K:X, (
         property_of(X, A, V2),
         property_of(X, M, V3),
         K is V2 + V3
-    ), NA).
-populate(A, _, _, A).
+    ), NA),
+    set_prop_to(amounts, G0, NA, G1),
+    findall(0:X, member(_:X, M), NO),
+    set_prop_to(outs, G1, NO, NG).
+populate(G, G).
 
 new_round(G0, NG):-
-    property_of(amounts, G0, GA),
-    property_of(factories, G0, GF),
-    populate(GA, GF, G0, A),
+    populate(G0, G1),
+    property_of(amounts, G1, A),
     findall(L, (
         member(V:C, A),
         add([], V, C, L)    
     ), W),
     concat_all(W, R),
     random_permutation(R, D),
-    use_fac(GF, D, F),
-    set_prop_to(amounts, G0, A, G1),
-    set_prop_to(factories, G1, F, NG).
+    property_of(factories, G1, GF),
+    findall(X, member(X:_, GF), Z),
+    use_fac(Z, D, Q),
+    concat_all(Q, S),
+    findall(V:C, (
+        member(Cur:C, A),
+        count(S, C, K),
+        V is Cur - K
+    ), NA),
+    set_prop_to(amounts, G1, NA, G2),
+    enumerate(Q, 1, F),
+    set_prop_to(factories, G2, F, NG).
 
 any_full_row(P, S):-
     property_of(table, P, T),
@@ -43,29 +56,10 @@ any_full_row(P, S):-
     length(Rows, S),
     any(Rows).
 
-ending_condion([], []).
-ending_condion(Data):-
-    findall(true, (
-        member(X, Data),
-        any_full_row(X, _)    
-    ), P),
-    any(P).
-
-line_score(L, Tile, S):-
-    make_intervals(L, I),
-    findall(X, (
-        member(X, I),
-        member(Tile, X)    
-    ), [B]),
-    length(B, S).
-    
-tile_score(P, (X, Y), S):-
-    property_of(table, P, T),
-    concat(T, [(X, Y)], N),
-    line_score(N, (X, Y), RS),
-    invert_axis(N, RN),
-    line_score(RN, (Y, X), CS),
-    S is RS + CS.
+ending_condion(Game):-
+    property_of(players, Game, P),
+    member(X:_, P),
+    any_full_row(X, _).
     
 full_rows(P, S):- 
     any_full_row(P, S), !.
@@ -76,8 +70,7 @@ cascade((5, Y), L):-
 cascade((X, Y), L):-
     member((X, Y), L),
     NX is X + 1,
-    Y1 is (Y + 1) mod 6,
-    max(Y1, 1, NY),
+    NY is max((Y + 1) mod 6, 1),
     cascade((NX, NY), L).
 
 full_colors(P, S):-
@@ -96,37 +89,53 @@ table_score(P, S):-
     full_colors(P, DS),
     S is RS * 2 + CS * 7 + 10 * DS.
 
-tiles_colors([blue, red, yellow, black, white]).
-
-new_game():-
+new_game([P, A:amounts, O:outs, F:factories]):-
     tiles_colors(C),
+    new_players(4, P),
     findall(20:X, member(X, C), A),
-    add([], 4, [[]:table, 0:score], P),
     findall(0:X, member(X, C), O),
     add([], 4, empty, E),
-    add([], 9, E, F),
-    Game = [P:players, A:amounts, O:outs, F:factories],
-    run(Game).
+    add([], 9, E, EF),
+    enumerate(EF, 1, F).
 
-run(G0):-
-    new_round(G0, G1),
-    %TODO: run the round
-    validate(G1).
+run(G0, NG):-
+    property_of(players, G0, P),
+    run_round(G0, P, G1),
+    validate(G1, NG).
 
-validate(G0):-
+validate(G0, NG):-
+    property_of(factories, G0, F),
+    findall(X, member(X:_, F), L),
+    concat_all(L, R),
+    length(R, Sz),
+    count(R, empty, Sz), !,
+    clean_players(G0, G1),
+    end_or_continue(G1, NG).
+validate(G0, NG):-
+    run(G0, NG).
+
+end_or_continue(G0, NG):-
     ending_condion(G0), !,
-    calculate_scores(G0, _).
+    calculate_scores(G0, NG).
     %TODO: show winner and scores
-validate(G):-
-    run(G).
+end_or_continue(G0, NG):-
+    new_round(G0, G1),
+    run(G1, NG).
+
 
 calculate_scores(G0, G1):-
     property_of(players, G0, GP),
-    findall(NP, (
-        member(X, GP),
+    findall(NP:Id, (
+        member(X:Id, GP),
         table_score(X, TS),
         property_of(score, X, PS),
         S is PS + TS,
         set_prop_to(score, X, S, NP)
     ), P),
     set_prop_to(players, G0, P, G1).
+
+main :-
+    new_game(G0), 
+    new_round(G0, G1),
+    run(G1, _). 
+    % TODO: Print the winner

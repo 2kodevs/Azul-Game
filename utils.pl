@@ -1,3 +1,5 @@
+tiles_colors([blue, red, yellow, black, white]).
+
 concat([], X, X).
 concat([X | R], Y, [X | Z]) :- 
     concat(R, Y, Z).
@@ -65,11 +67,6 @@ set_prop_to(P, O, V, N):-
 invert_axis(L, R):-
     findall((Y, X), member((X, Y), L), R).
 
-max(X, Y, Y):-
-    Y >= X, !.
-max(X, Y, X):-
-    X >= Y.
-
 replace(L, 0, _, _, L):- !.
 replace(L, _, V, _, L):-
     not(member(V, L)), !.
@@ -87,3 +84,8 @@ index_of(V, L, I):-
 count(L, V, R):-
     findall(1, member(V, L), K),
     length(K, R).   
+
+enumerate([], _, []).
+enumerate([E1 | List], Number, [E1:Number | Enum]):-
+    Next is Number + 1,
+    enumerate(List, Next, Enum).
