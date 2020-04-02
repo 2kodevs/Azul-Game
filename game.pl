@@ -61,7 +61,7 @@ any_full_row(P, S):-
     length(Rows, S),
     any(Rows).
 
-ending_condion(Game):-
+ending_condition(Game):-
     property_of(players, Game, P),
     member(X:_, P),
     any_full_row(X, _).
@@ -131,7 +131,7 @@ validate(G0, _, NG):-
     run(G0, NG).
 
 end_or_continue(G0, _, NG):-
-    ending_condion(G0), !,
+    ending_condition(G0), !,
     calculate_scores(G0, NG).
     %TODO: show winner and scores
 end_or_continue(G0, E, NG):-
