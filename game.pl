@@ -1,4 +1,7 @@
 :- [player].
+:- dynamic initial_player/1.
+
+initial_player(1).
 
 use_fac(L, [], L).
 use_fac([], _, []).
@@ -101,40 +104,41 @@ new_game([P, A:amounts, O:outs, F:factories]):-
     enumerate(EF, 1, NF),
     set_prop_to(center, NF, [], F).
 
-order_players(G0, E, NG):-
-    property_of(players, G0, P0),
+order_players(G, NP):-
+    property_of(players, G, P0),
     indexed_sort(P0, P1),
-    sort_players(P1, E, P2),
-    set_prop_to(players, G0, P2, NG).
+    sort_players(P1, NP).
 
-sort_players(P0, E, NP):-
-    property_of(center, E, Pid), !,
+sort_players(P0, NP):-
+    initial_player(Pid),
     concat(A, [V:Pid | B], P0),
     concat([V:Pid | B], A, NP).
-sort_players(P, _, P).
 
 run(G0, NG):-
-    property_of(players, G0, P),
+    order_players(G0, P),
     run_round(G0, P, G1, E),
-    order_players(G1, E, G2),
-    validate(G2, NG).
+    validate(G1, E, NG).
 
-validate(G0, NG):-
+validate(G0, E, NG):-
     property_of(factories, G0, F),
     findall(X, member(X:_, F), L),
     concat_all(L, R),
     length(R, Sz),
     count(R, empty, Sz), !,
     clean_players(G0, G1),
-    end_or_continue(G1, NG).
-validate(G0, NG):-
+    end_or_continue(G1, E, NG).
+validate(G0, _, NG):-
     run(G0, NG).
 
-end_or_continue(G0, NG):-
+end_or_continue(G0, _, NG):-
     ending_condion(G0), !,
     calculate_scores(G0, NG).
     %TODO: show winner and scores
-end_or_continue(G0, NG):-
+end_or_continue(G0, E, NG):-
+    initial_player(Id),
+    get_value_or_default(center, E, Nid, Id),
+    retract(initial_player(Id)),
+    asserta(initial_player(Nid)),
     new_round(G0, G1),
     run(G1, NG).
 
