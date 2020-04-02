@@ -15,7 +15,7 @@ test(concat_all, [nondet]) :-
 
 test(make_intervals, [nondet]) :-
     make_intervals([(0, 0),  (0, 1),  (1, 1),  (1, 3)], R),
-    assertion(R==[[(0, 0),  (0, 1),  (1, 1)], [(1, 3)]]).
+    assertion(R==[[(0, 0),  (0, 1)], [(1, 1)], [(1, 3)]]).
 
 test(prop, [nondet]) :-
     set_prop_to(prop1, [[1, 2, 3]:prop1, v2:prop2], v1, N),
