@@ -114,10 +114,11 @@ sort_players(P0, NP):-
     concat(A, [V:Pid | B], P0),
     concat([V:Pid | B], A, NP).
 
-run(G0, NG):-
+run(G0, E, NG):-
     order_players(G0, P),
-    run_round(G0, P, G1, E),
-    validate(G1, E, NG).
+    run_round(G0, P, G1, NE),
+    concat(E, NE, AE),
+    validate(G1, AE, NG).
 
 validate(G0, E, NG):-
     property_of(factories, G0, F),
@@ -127,8 +128,8 @@ validate(G0, E, NG):-
     count(R, empty, Sz), !,
     clean_players(G0, G1),
     end_or_continue(G1, E, NG).
-validate(G0, _, NG):-
-    run(G0, NG).
+validate(G0, E, NG):-
+    run(G0, E, NG).
 
 end_or_continue(G0, _, NG):-
     ending_condition(G0), !,
@@ -145,7 +146,7 @@ end_or_continue(G0, E, NG):-
     set_prop_to(Nid, GP, NF, NP),
     set_prop_to(players, G0, NP, G1),
     new_round(G1, G2),
-    run(G2, NG).
+    run(G2, [], NG).
 
 calculate_scores(G0, G1):-
     property_of(players, G0, GP),
@@ -161,5 +162,5 @@ calculate_scores(G0, G1):-
 main :-
     new_game(G0), 
     new_round(G0, G1),
-    run(G1, _), !. 
+    run(G1, [], _), !. 
     % TODO: Print the winner
