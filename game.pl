@@ -139,8 +139,13 @@ end_or_continue(G0, E, NG):-
     get_value_or_default(center, E, Nid, Id),
     retract(initial_player(Id)),
     asserta(initial_player(Nid)),
-    new_round(G0, G1),
-    run(G1, NG).
+    property_of(players, G0, GP),
+    property_of(Nid, GP, F),
+    penalize(F, -1, NF),
+    set_prop_to(Nid, GP, NF, NP),
+    set_prop_to(players, G0, NP, G1),
+    new_round(G1, G2),
+    run(G2, NG).
 
 calculate_scores(G0, G1):-
     property_of(players, G0, GP),
@@ -156,5 +161,5 @@ calculate_scores(G0, G1):-
 main :-
     new_game(G0), 
     new_round(G0, G1),
-    run(G1, _). 
+    run(G1, _), !. 
     % TODO: Print the winner
