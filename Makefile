@@ -1,5 +1,4 @@
 test: ## Run tests
-	swipl -t "load_test_files([]), run_tests." -s utils.pl
 	swipl -t "load_test_files([]), run_tests." -s game.pl
 
 coverage: ## Run tests and display coverage
