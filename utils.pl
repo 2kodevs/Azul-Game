@@ -80,6 +80,7 @@ replace(L, T, V, N, R):-
 index_of(V, L, I):-
     concat(A, [V | _], L), !,
     length(A, I).
+index_of(_, _, -1).
 
 count(L, V, R):-
     findall(1, member(V, L), K),
@@ -89,3 +90,9 @@ enumerate([], _, []).
 enumerate([E1 | List], Number, [E1:Number | Enum]):-
     Next is Number + 1,
     enumerate(List, Next, Enum).
+
+indexed_sort(L, R):-
+    findall(X:Y, property_of(X, L, Y), I),
+    sort(I, O),
+    findall(X:Y, property_of(X, O, Y), R).
+    
