@@ -1,3 +1,7 @@
+:- use_module(library(http/http_path)).
+http:location(pldoc, root('help/source'), [priority(10)]).
+:- doc_server(9000).
+
 tiles_colors([blue, red, yellow, black, white]).
 
 concat([], X, X).
