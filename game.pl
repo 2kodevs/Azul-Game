@@ -1,10 +1,10 @@
 :- [player].
-:- dynamic initial_player/1.
+:- (dynamic initial_player/1).
 
 %% initial_player(-Id:int) is det
 % 
 % The initial_player/1 fact store the id 
-% of the player that be the first in the current
+% of the player who is the first to play in the current
 % round.
 %
 % @param Id return the first player Id
@@ -13,21 +13,21 @@ initial_player(1).
 
 %% use_fac(+EmptyFactories:list, +Tiles:list, -FullFactories) is det
 % 
-% The use_fac/3 predicate given a set of factories
-% fill each one following the tiles orther that is
-% given too.
+% The use_fac/3 predicate given a set of factories  
+% fill each one following the order of the
+% tiles which is also given.
 %
-% @param EmtyFactories A list compoused ideally with [[empty, ...], [empty, ...], ...], 
+% @param EmptyFactories A list compoused ideally with [[empty, ...], [empty, ...], ...], 
 % representing the empty factories
 % @param Colors A list of tiles to add to the factories
 % @param FullFactories The result of put the Tiles into the factories
 % @copyright 2kodevs 2019-2020
 use_fac([], _, []).
 use_fac(Factories, [], Factories).
-use_fac([[] | Factories], Tiles, [[] | Result]):-
+use_fac([[]|Factories], Tiles, [[]|Result]) :-
     use_fac(Factories, Tiles, Result).
-use_fac([[_ | Fac1] | Factories], [Tile1 | Tiles], [[Tile1 | Res1] | Result]):-
-    use_fac([Fac1 | Factories], Tiles, [Res1 | Result]).
+use_fac([[_|Fac1]|Factories], [Tile1|Tiles], [[Tile1|Res1]|Result]) :-
+    use_fac([Fac1|Factories], Tiles, [Res1|Result]).
 
 %% populate(+Game:Game, -NewGame:Game) is det
 % 
@@ -38,21 +38,22 @@ use_fac([[_ | Fac1] | Factories], [Tile1 | Tiles], [[Tile1 | Res1] | Result]):-
 % @param Game Current Game state
 % @param NewGame The new Game with more or the same amount of tile in the bag
 % @copyright 2kodevs 2019-2020
-populate(Game, NewGame):-
+populate(Game, NewGame) :-
     property_of(amounts, Game, Amounts),
     property_of(factories, Game, Factories),
     length(Factories, FacSz),
     findall(X, member(X:_, Amounts), Quantities),
     sum_list(Quantities, Sum), 
     % check if the tiles could full the factories
-    Sum < FacSz * 4, !,
+    Sum<FacSz*4, !,
     property_of(outs, Game, Outs),
     % adding tiles to the bag
-    findall(RealAmount:Color, (
-        property_of(Color, Amounts, QAmount),
-        property_of(Color, Outs, QOut),
-        RealAmount is QOut + QAmount
-    ), NewAmounts),
+    findall(RealAmount:Color,
+            ( property_of(Color, Amounts, QAmount),
+              property_of(Color, Outs, QOut),
+              RealAmount is QOut+QAmount
+            ),
+            NewAmounts),
     set_prop_to(amounts, Game, NewAmounts, TempGame),
     % Saving that 0 tiles are out
     findall(0:Color, member(_:Color, Outs), NewOuts),
@@ -61,20 +62,21 @@ populate(Game, Game).
 
 %% new_round(+Game:Game, -NewGame:Game) is multi
 % 
-% The new_round/2 predicate prepare the Game after the starting of a new round.
+% The new_round/2 predicate prepare the Game before the start of a new round.
 %
 % @param Game Current Game state
 % @param NewGame The new Game ready to run a new round
 % @copyright 2kodevs 2019-2020
-new_round(Game, NewGame):-
+new_round(Game, NewGame) :-
     % Check if more tiles are needed
     populate(Game, TempGame1),
-    %Selec the random tiles to add
+    %Select the random tiles to add
     property_of(amounts, TempGame1, Amounts),
-    findall(List, (
-        property_of(Color, Amounts, Quantity),
-        add([], Quantity, Color, List)    
-    ), ColorGroups),
+    findall(List,
+            ( property_of(Color, Amounts, Quantity),
+              add([], Quantity, Color, List)
+            ),
+            ColorGroups),
     concat_all(ColorGroups, ColorsList),
     random_permutation(ColorsList, ColorsOrder),
     % Saving the selected tiles
@@ -84,11 +86,12 @@ new_round(Game, NewGame):-
     use_fac(RawFac, ColorsOrder, TempFac),
     concat_all(TempFac, UsedTiles),
     % Update the amount of tiles, and create the new game
-    findall(NewQ:Color, (
-        property_of(Color, Amounts, QOld),
-        count(UsedTiles, Color, Used),
-        NewQ is QOld - Used
-    ), NewAmounts),
+    findall(NewQ:Color,
+            ( property_of(Color, Amounts, QOld),
+              count(UsedTiles, Color, Used),
+              NewQ is QOld-Used
+            ),
+            NewAmounts),
     set_prop_to(amounts, TempGame1, NewAmounts, TempGame2),
     enumerate(TempFac, 1, EnumFac),
     set_prop_to(center, EnumFac, [], AllFac),
@@ -96,28 +99,31 @@ new_round(Game, NewGame):-
 
 %% any_full_row(+Player:Player, -Rows:Game) is semidet
 % 
-% The any_full_row/2 predicate check is the player have any full row
-% int their Wall.
+% The any_full_row/2 predicate check if the player have any full row
+% in his Wall.
 %
 % @param Player Player target
 % @param Rows On succeeds, return the number of full rows 
 % @copyright 2kodevs 2019-2020
-any_full_row(Player, RowsQ):-
+any_full_row(Player, RowsQ) :-
     property_of(table, Player, Table),
-    findall(true, (
-        bagof(Column, member((_, Column), Table), Columns),
-        length(Columns, 5)
-    ), Rows),
+    findall(true,
+            ( bagof(Column,
+                    member((_, Column), Table),
+                    Columns),
+              length(Columns, 5)
+            ),
+            Rows),
     length(Rows, RowsQ),
     any(Rows).
 
 %% ending_condition(+Game:Game) is semidet
 % 
-% The ending_condition/1 predicate check is the Game ends.
+% The ending_condition/1 predicate check if the Game ends.
 %
 % @param Game Game to verify. 
 % @copyright 2kodevs 2019-2020
-ending_condition(Game):-
+ending_condition(Game) :-
     property_of(players, Game, P),
     member(X:_, P),
     any_full_row(X, _).
@@ -125,12 +131,12 @@ ending_condition(Game):-
 %% full_rows(+Player:Player, -Rows:Game) is det
 % 
 % The full_rows/2 predicate is a wrapper for any_full_row/2
-% that return 0 when that method fail
+% that return 0 when that function fails
 %
 % @param Player Player target
 % @param Rows Return the number of full rows 
 % @copyright 2kodevs 2019-2020
-full_rows(Player, RowsQ):- 
+full_rows(Player, RowsQ) :-
     any_full_row(Player, RowsQ), !.
 full_rows(_, 0).
 
@@ -142,12 +148,12 @@ full_rows(_, 0).
 % @param Tile A table point
 % @param Table Table target 
 % @copyright 2kodevs 2019-2020
-cascade((5, Col), Table):-
+cascade((5, Col), Table) :-
     member((5, Col), Table).
-cascade((Row, Col), Table):-
+cascade((Row, Col), Table) :-
     member((Row, Col), Table),
-    NewRow is Row + 1,
-    NewCol is max((Col + 1) mod 6, 1),
+    NewRow is Row+1,
+    NewCol is max((Col+1)mod 6, 1),
     cascade((NewRow, NewCol), Table).
 
 %% full_colors(+Player:Player, -Amount:int) is det
@@ -158,12 +164,13 @@ cascade((Row, Col), Table):-
 % @param Player Player target
 % @param Amount Number of full colors
 % @copyright 2kodevs 2019-2020
-full_colors(Player, Amount):-
+full_colors(Player, Amount) :-
     property_of(table, Player, Table),
-    findall(true, (
-        member((1, Col), Table),
-        cascade((1, Col), Table)
-    ), List),
+    findall(true,
+            ( member((1, Col), Table),
+              cascade((1, Col), Table)
+            ),
+            List),
     length(List, Amount).    
 
 %% table_score(+Player:Player, -Score:int) is det
@@ -173,21 +180,21 @@ full_colors(Player, Amount):-
 % @param Player Player target
 % @param Score Player Wall Score
 % @copyright 2kodevs 2019-2020
-table_score(P, S):-
+table_score(P, S) :-
     full_rows(P, RS),
     property_of(table, P, T),
     invert_axis(T, RT),
     full_rows([RT:table], CS),
     full_colors(P, DS),
-    S is RS * 2 + CS * 7 + 10 * DS.
+    S is RS*2+CS*7+10*DS.
 
 %% new_game(-Game:Game) is det
 % 
-% The new_game/1 predicate prepare an standar 4 player game
+% The new_game/1 predicate prepare a standard 4 player game
 %
 % @param Game New Game
 % @copyright 2kodevs 2019-2020
-new_game([P, A:amounts, O:outs, F:factories]):-
+new_game([P, A:amounts, O:outs, F:factories]) :-
     tiles_colors(C),
     new_players(4, P),
     findall(20:X, member(X, C), A),
@@ -204,7 +211,7 @@ new_game([P, A:amounts, O:outs, F:factories]):-
 % @param Game A runing Game
 % @param Players Sorted Players
 % @copyright 2kodevs 2019-2020
-order_players(Game, NewPlayers):-
+order_players(Game, NewPlayers) :-
     property_of(players, Game, Players),
     indexed_sort(Players, OriginalOrder),
     sort_players(OriginalOrder, NewPlayers).
@@ -217,21 +224,21 @@ order_players(Game, NewPlayers):-
 % @param Players Players target
 % @param Players Ordered Players
 % @copyright 2kodevs 2019-2020
-sort_players(Players, NewPlayers):-
+sort_players(Players, NewPlayers) :-
     initial_player(Pid),
-    concat(A, [Player:Pid | B], Players),
-    concat([Player:Pid | B], A, NewPlayers).
+    concat(A, [Player:Pid|B], Players),
+    concat([Player:Pid|B], A, NewPlayers).
 
 %% run(+Game:Game, +Events:list, -NewGame:Game) is det
 % 
 % The run/3 predicate run the Game until it ends, given a list of 
-% previos occured selection that players did in the current round.
+% previous occured selection that players did in the current round.
 %
 % @param Game Game target
 % @param Events Players selections in the round
 % @param NewGame The resulting Game
 % @copyright 2kodevs 2019-2020
-run(Game, Events, NewGame):-
+run(Game, Events, NewGame) :-
     order_players(Game, Players),
     run_round(Game, Players, TempGame, CurEvents),
     concat(Events, CurEvents, NewEvents),
@@ -240,13 +247,13 @@ run(Game, Events, NewGame):-
 %% validate(+Game:Game, +Events:list, -NewGame:Game) is det
 % 
 % The validate/3 predicate check if the Game current round end, 
-% start a new want if needed, and continue running the Game.
+% start a new one if needed, and continue running the Game.
 %
 % @param Game Game target
 % @param Events Players selections in the round
 % @param NewGame The resulting Game
 % @copyright 2kodevs 2019-2020
-validate(Game, Events, NewGame):-
+validate(Game, Events, NewGame) :-
     property_of(factories, Game, Factories),
     findall(Fac, member(Fac:_, Factories), FacList),
     concat_all(FacList, AllTiles),
@@ -254,22 +261,22 @@ validate(Game, Events, NewGame):-
     count(AllTiles, empty, Sz), !,
     clean_players(Game, TempGame),
     end_or_continue(TempGame, Events, NewGame).
-validate(Game, Events, NewGame):-
+validate(Game, Events, NewGame) :-
     run(Game, Events, NewGame).
 
 %% end_or_continue(+Game:Game, +Events:list, -NewGame:Game) is det
 % 
 % The end_or_continue/3 predicate check if the Game ends and calculate the scores, 
-% or cotinue running the game.
+% or continue running the game.
 %
 % @param Game Game target
 % @param Events Players selections in the round
 % @param NewGame The resulting Game
 % @copyright 2kodevs 2019-2020
-end_or_continue(Game, _, NewGame):-
+end_or_continue(Game, _, NewGame) :-
     ending_condition(Game), !,
     calculate_scores(Game, NewGame).
-end_or_continue(Game, Events, NewGame):-
+end_or_continue(Game, Events, NewGame) :-
     initial_player(Id),
     get_value_or_default(center, Events, NewId, Id),
     retract(initial_player(Id)),
@@ -289,20 +296,21 @@ end_or_continue(Game, Events, NewGame):-
 % @param Game Game target
 % @param NewGame The Game with the scores calculated
 % @copyright 2kodevs 2019-2020
-calculate_scores(Game, NewGame):-
+calculate_scores(Game, NewGame) :-
     property_of(players, Game, Players),
-    findall(NewPlayer:Id, (
-        property_of(Id, Players, Player),
-        table_score(Player, TableScore),
-        property_of(score, player, Score),
-        NewScore is Score + TableScore,
-        set_prop_to(score, Player, NewScore, NewPlayer)
-    ), NewPlayers),
+    findall(NewPlayer:Id,
+            ( property_of(Id, Players, Player),
+              table_score(Player, TableScore),
+              property_of(score, player, Score),
+              NewScore is Score+TableScore,
+              set_prop_to(score, Player, NewScore, NewPlayer)
+            ),
+            NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
 
 main :-
-    new_game(Game), 
+    new_game(Game),
     new_round(Game, NewGame),
     run(NewGame, [], _), !. 
     % TODO: Print the winner
