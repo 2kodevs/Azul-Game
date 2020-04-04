@@ -19,9 +19,9 @@ random_strategy(S) :-
 
 %% line_score(+List:list, +Tile:point, -Score:int) is det
 % 
-% The line_score/3 predicate find the score of add Tile to a line
+% The line_score/3 predicate find the score of add Tile to a row of table
 %
-% @param List Line where Tile is being added
+% @param List Row of table where Tile is being added
 % @param Tile New tile
 % @param Score Number of tiles adyacent to Tile
 % @copyright 2kodevs 2019-2020
