@@ -2,12 +2,37 @@
 http:location(pldoc, root('help/source'), [priority(10)]).
 :- doc_server(9000).
 
+%% tiles_colors(+Colors:list) is det
+% 
+% The tiles_colors/1 fact return the game tile colors 
+%
+% @param Colors Return the Tiles colors of the game
+% @copyright 2kodevs 2019-2020
 tiles_colors([blue, red, yellow, black, white]).
 
+%% concat(+List1:list, +List2:list, -Result:list) is det
+% 
+% The concat/3 predicate return the concatination of List1 and List2
+% in Result 
+%
+% @param List1 First part of the result list
+% @param List2 Second part of the result list
+% @param Result The concatenation list
+% @copyright 2kodevs 2019-2020
 concat([], X, X).
 concat([X | R], Y, [X | Z]) :- 
     concat(R, Y, Z).
 
+%% add(+List:list, +Amount:list, +Element, -Result:list) is det
+% 
+% The add/4 predicate return the concatination of Amount occurences
+% of Element at the end of List 
+%
+% @param List First part of the result list
+% @param Amount Times that Element needs to be concatenated
+% @param Element Value to concatenate
+% @param Result The concatenation list
+% @copyright 2kodevs 2019-2020
 add(L, 0, _, L).
 add(L, K, X, R):-
     K > 0,
@@ -15,29 +40,74 @@ add(L, K, X, R):-
     concat(L, [X], L1),
     add(L1, P, X, R).
 
+%% list_print(+List:list) is det
+% 
+% The list_print/1 predicate print the List element in lines 
+% separated by newline 
+%
+% @param List List target
+% @copyright 2kodevs 2019-2020
 list_print([]).
 list_print([X | L]):-
     writeln(X),
     list_print(L).
 
+%% isList(+Object) is det
+% 
+% The isList/1 fact return if Object is a list 
+% separated by newline 
+%
+% @param List List target
+% @copyright 2kodevs 2019-2020
 isList([]).
 isList([_|_]).
 
+%% concat_all(+List:list, -Result:list) is det
+% 
+% The concat_all/2 predicate return the concatination of all list elements of List
+%
+% @param List1 List that contains the lists to concatenate
+% @param Result The concatenation list
+% @copyright 2kodevs 2019-2020
 concat_all([], []).
 concat_all([X | Y], R) :- 
     concat_all(Y, L),
     concat(X, L, R).
 
+%% any(+Object) is semidet
+% 
+% The any/1 predicate return if Object is true, or is a list that contains any true
+%
+% @param Object Target
+% @copyright 2kodevs 2019-2020
 any(true).
 any(L) :- 
     isList(L), member(true, L).
 
+%% consecutive(+List:list, +Point:point, -Consecutive:list, -Others:list) is det
+% 
+% The consecutive/4 predicate split the List in two parts. The elements concecutive
+% in the to Point line, and the rest of them.
+% 
+% @param List Points list
+% @param Point Target
+% @param Consecutive Prefix of List containing the consecutive elements to Point
+% @param Others Suffix of List with the rest of the elements
+% @copyright 2kodevs 2019-2020
 consecutive([(X, B) | L], (X, Y), C, R):-
     B is Y + 1, !,
     consecutive(L, (X, B), A, R),
     concat([(X, B)], A, C).
 consecutive(L, _, [], L).
 
+%% blocks(+List:list, -Blocks:list) is det
+% 
+% The blocks/2 predicate return a set of list that represent the 
+% groups of elements that are consecutive in List. See consecutive/2
+% 
+% @param List Points list
+% @param Block Consecutive groups of points
+% @copyright 2kodevs 2019-2020
 blocks([], []).
 blocks([X | L], I):-
     consecutive(L, X, C, R),
@@ -45,18 +115,51 @@ blocks([X | L], I):-
     blocks(R, K),  
     concat([B], K, I).
 
+%% make_intervals(+List:list, -Intervals:list) is det
+% 
+% The make_intervals/2 predicate return the Blocks of List after a sort operation
+% 
+% @param List Points list
+% @param Intervals Consecutive groups of points
+% @copyright 2kodevs 2019-2020
 make_intervals(L, I):-
     isList(L),
     sort(L, S),
     blocks(S, I).
 
+%% property_of(+Property, +Object:list, -Value) is nondet
+% 
+% The property_of/3 predicate return Value of an Object Property
+% 
+% @param Porperty Object property target
+% @param Object Target
+% @param Value The value associated with the object property
+% @copyright 2kodevs 2019-2020
 property_of(P, O, V):-
     member(V:P, O).
 
+%% get_value_or_default(+Property, +Object:list, -Value, +Default) is multi
+% 
+% The get_value_or_default/4 predicate is a wrapper for
+% property_of/3 the same value when it succeesds and Default when it fails
+% 
+% @param Porperty Object property target
+% @param Object Target
+% @param Value The value associated with the object property
+% @param Default The return value on failures
+% @copyright 2kodevs 2019-2020
 get_value_or_default(P, O, V, _):-
-    property_of(P, O, V), !.
+    property_of(P, O, V).
 get_value_or_default(_, _, D, D).
 
+%% remove_prop(+Property, +Object:list, -NewObject:list) is det
+% 
+% The remove_prop/3 predicate remove a property of an object
+% 
+% @param Porperty Object property target
+% @param Object Target
+% @param NewObject The same as Object without property
+% @copyright 2kodevs 2019-2020
 remove_prop(_, [], []).
 remove_prop(P, [(_:P) | R], L):-
     !, remove_prop(P, R, L). 
@@ -64,13 +167,40 @@ remove_prop(P, [(X:Y) | R], [(X:Y) | L]):-
     Y \= P,
     remove_prop(P, R, L).
 
+%% set_prop_to(+Property, +Object:list, +Value, -NewObject:list) is det
+% 
+% The set_prop_to/4 predicate set the value of an Object property
+% 
+% @param Porperty Object property target
+% @param Object Target
+% @param Value new property value
+% @param NewObject Modified object
+% @copyright 2kodevs 2019-2020
 set_prop_to(P, O, V, N):-
     remove_prop(P, O, C),
     concat([V:P], C, N).
 
+%% invert_axis(+List:list, -Result:list) is det
+% 
+% The invert_axis/2 predicate invert the cordinates of all points of List
+% 
+% @param List Points list
+% @param Result Points inverted list
+% @copyright 2kodevs 2019-2020
 invert_axis(L, R):-
     findall((Y, X), member((X, Y), L), R).
 
+%% replace(+List:list, +Amount:int, +Value, +NewValue, -Result:list) is det
+% 
+% The replace/5 predicate change the first Amount occurences of Value in List
+% to NewValue
+% 
+% @param List Objects list
+% @param Amount The number of replacements
+% @param Value The value to replace
+% @param NewValue The new value in Result
+% @param Result The list with the replacements
+% @copyright 2kodevs 2019-2020
 replace(L, 0, _, _, L):- !.
 replace(L, _, V, _, L):-
     not(member(V, L)), !.
@@ -81,20 +211,52 @@ replace(L, T, V, N, R):-
     replace(B, Z, V, N, K),
     concat(A, [N | K], R).
 
+%% index_of(+Value, +List:list, -Index:int) is multi
+% 
+% The index_of/3 predicate return the index of Value in List
+% 
+% @param Value Target
+% @param List Elements container
+% @param Index The index of Value in List
+% @copyright 2kodevs 2019-2020
 index_of(V, L, I):-
     concat(A, [V | _], L), !,
     length(A, I).
 index_of(_, _, -1).
 
+%% count(+List:list, +Value, -Amount:int) is det
+% 
+% The count/3 predicate return Amount of occurences of Value in List
+% 
+% @param List Elements container
+% @param Value Target
+% @param Amount Number of ocurences
+% @copyright 2kodevs 2019-2020
 count(L, V, R):-
     findall(1, member(V, L), K),
     length(K, R).   
 
+%% enumerate(+List:list, +Start:int, -Result:Index-List) is det
+% 
+% The enumerate/3 predicate return the List with its elements enumerate from Start
+% to N, where N is Start + length of List
+% 
+% @param List Elements container
+% @param Start The initial number to asign
+% @param Result Enumerated List
+% @copyright 2kodevs 2019-2020
 enumerate([], _, []).
 enumerate([E1 | List], Number, [E1:Number | Enum]):-
     Next is Number + 1,
     enumerate(List, Next, Enum).
 
+%% indexed_sort(+List:Index-List, -Result:Index-List) is det
+% 
+% The indexed_sort/2 predicate return List sorted by its indexes
+% 
+% @param List Elements container
+% @param Result Elements Ordered by index
+% @copyright 2kodevs 2019-2020
 indexed_sort(L, R):-
     findall(X:Y, property_of(X, L, Y), I),
     sort(I, O),
