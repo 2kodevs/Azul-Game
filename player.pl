@@ -340,9 +340,9 @@ run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
         "Player chose all color ", 
         Color, " from factory ",
         Fid, " and add them to the ",
-        Lid, " line\n",
-        "----------------------------------------------"
+        Lid, " line"
     ]),
+    info_log([NewP1:pattern, "\n----------------------------------------------"]),
     property_of(players, TempGame1, OldPlayers),
     set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),
@@ -360,9 +360,10 @@ clean_players(Game, NewGame) :-
     findall(Player:Id,
             ( member(X:Id, Players),
               property_of(board, X, Board),
+              verify_lines(X, Board, CleanedPlayer),
+              info_log([CleanedPlayer:player]),
               penalization_list(Penalizations),
-              set_prop_to(penalization, X, Penalizations, Y),
-              verify_lines(Y, Board, Player)
+              set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
             ),
             NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).

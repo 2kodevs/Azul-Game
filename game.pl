@@ -291,13 +291,11 @@ end_or_continue(Game, Events, NewGame) :-
         "Player ", 
         NewId, 
         " will be the first at the next round. ",
-        "Cause that recive a penalization"
+        "Cause that recive a penalization\n"
     ]),
-    info_log(["All factories are empty. The round ends."]),
     set_prop_to(NewId, Players, NewFirstP, NewPlayers),
     set_prop_to(players, Game, NewPlayers, TempGame1),
     new_round(TempGame1, TempGame2),
-    info_log(["Current scores:\n", TempGame2:scores, "\n"]),
     run(TempGame2, [], NewGame).
 
 %% calculate_scores(+Game:Game, -NewGame:Game) is det
@@ -321,7 +319,6 @@ calculate_scores(Game, NewGame) :-
 
 
 main :-
-    set_log_mode(debug),
     project_info,
     info_log(["Preparing a 4 players Game"]),
     new_game(Game),
