@@ -31,12 +31,13 @@ log_id(warning, 2).
 log_id(info, 3).
 log_id(debug, 4).
 
-%% print_log(+Data) is det
+%% print_log(+Data, +FileDescriptor) is det
 % 
-% The print_log/1 predicate try to display Data in the
+% The print_log/1 predicate write Data to FileDescriptor in the
 % better possible way.
 %
 % @param Data Output Target
+% @param FileDescriptor File Target
 % @copyright 2kodevs 2019-2020
 print_log(error, FD):- write(FD, "EROR: ").
 print_log(warning, FD):- write(FD, "WARNING: ").
@@ -122,6 +123,18 @@ set_log_mode(Mode):-
     log_mode(Id),
     log_id(Current, Id),
     warning_log(["Unkonwn mode <", Mode, ">. Previous mode <", Current, "> is still in use."]).
+
+%% set_log_file(+FileDir) is det
+% 
+% The set_log_file/1 predicate set the path where the logger  
+% write to FileDir.
+%
+% @param FileDir File to use for store the logs
+% @copyright 2kodevs 2019-2020
+set_log_file(Dir):-
+    log_dir(OldDir),
+    retract(log_dir(OldDir)),
+    asserta(log_mode(Dir)), !.
 
 %% file_descriptor(+Mode, -FileDescriptor) is det
 % 
