@@ -10,6 +10,8 @@ http:location(pldoc, root('help/source'), [priority(10)]).
 % @copyright 2kodevs 2019-2020
 tiles_colors([blue, red, yellow, black, white]).
 
+log_output("log.log").
+
 %% concat(+List1:list, +List2:list, -Result:list) is det
 % 
 % The concat/3 predicate return the concatenation of List1 and List2
@@ -268,4 +270,11 @@ indexed_sort(L, R) :-
     findall(X:Y,
             property_of(X, O, Y),
             R).
+
+log(Text) :-
+    log_output(O),
+    open(O, append, Out),
+    write(Out, Text),
+    write(Out, '\n'),
+    close(Out).
     
