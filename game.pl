@@ -262,7 +262,6 @@ validate(Game, Events, NewGame) :-
     concat_all(FacList, AllTiles),
     length(AllTiles, Sz),
     count(AllTiles, empty, Sz), !,
-    info_log(["All factories are empty. The round ends.\n"]),
     clean_players(Game, TempGame),
     end_or_continue(TempGame, Events, NewGame).
 validate(Game, Events, NewGame) :-
@@ -288,9 +287,17 @@ end_or_continue(Game, Events, NewGame) :-
     property_of(players, Game, Players),
     property_of(NewId, Players, FirstPlayer),
     penalize(FirstPlayer, -1, NewFirstP),
+    info_log([
+        "Player ", 
+        NewId, 
+        " will be the first at the next round. ",
+        "Cause that recive a penalization"
+    ]),
+    info_log(["All factories are empty. The round ends."]),
     set_prop_to(NewId, Players, NewFirstP, NewPlayers),
     set_prop_to(players, Game, NewPlayers, TempGame1),
     new_round(TempGame1, TempGame2),
+    info_log(["Current scores:\n", TempGame2:scores, "\n"]),
     run(TempGame2, [], NewGame).
 
 %% calculate_scores(+Game:Game, -NewGame:Game) is det
