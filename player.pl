@@ -8,6 +8,14 @@
 % @copyright 2kodevs 2019-2020
 penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 
+%% strategies(-strategies:list) is det
+% 
+% The strategies/1 fact return the list of strategies that a player can select
+%
+% @param strategies Return the strategies list
+% @copyright 2kodevs 2019-2020
+strategies([basic]).
+
 %% random_strategy(-Strategy:Functor) is det
 % 
 % The random_strategy/1 predicate return a random play strategy 
@@ -15,13 +23,14 @@ penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 % @param Strategy Functor of one strategy
 % @copyright 2kodevs 2019-2020
 random_strategy(S) :-
-    random_permutation([basic], [S|_]).    
+    strategies(St),
+    random_permutation(St, [S|_]).    
 
 %% line_score(+List:list, +Tile:point, -Score:int) is det
 % 
-% The line_score/3 predicate find the score of add Tile to a line
+% The line_score/3 predicate find the score of add Tile to a row of table
 %
-% @param List Line where Tile is being added
+% @param List Row of table where Tile is being added
 % @param Tile New tile
 % @param Score Number of tiles adyacent to Tile
 % @copyright 2kodevs 2019-2020
@@ -96,7 +105,7 @@ valid_choices(Game, Player, Choices) :-
 % pattern lines is full, it becomes an empty line.
 %
 % @param Player Target
-% @param Line Patter line id
+% @param Line Pattern line id
 % @param NewPlayer Updated player
 % @copyright 2kodevs 2019-2020
 clean_line(Player, L, NewPlayer) :-
