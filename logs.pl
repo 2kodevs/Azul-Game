@@ -39,10 +39,10 @@ log_id(debug, 4).
 % @param Data Output Target
 % @param FileDescriptor File Target
 % @copyright 2kodevs 2019-2020
-print_log(error, FD):- write(FD, "EROR: ").
-print_log(warning, FD):- write(FD, "WARNING: ").
-print_log(info, FD):- write(FD, "INFO: ").
-print_log(debug, FD):- write(FD, "DEBUG: ").
+print_log(error, FD):- write(FD, "ERROR: "), !.
+print_log(warning, FD):- write(FD, "WARNING: "), !.
+print_log(info, FD):- write(FD, "INFO: "), !.
+print_log(debug, FD):- write(FD, "DEBUG: "), !.
 print_log(Data, FD):- write(FD, Data).
 
 %% show_logs(+List:list) is det
@@ -58,7 +58,7 @@ show_logs(List):-
         member(Data, List),
         print_log(Data, FD)
     ), _),
-    close(FD).
+    nl(FD), close(FD).
 
 %% valid_log(+ModeName, +List:list) is det
 % 
@@ -72,7 +72,7 @@ valid_log(Mode, List):-
     log_id(Mode, Id),
     log_mode(Current),
     Current >= Id, !,
-    show_logs([Mode | List]), nl.
+    show_logs([Mode | List]).
 valid_log(_, _).
 
 %% error_log(+List:list) is det
