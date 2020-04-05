@@ -38,8 +38,11 @@ log_id(debug, 4).
 %
 % @param Data Output Target
 % @copyright 2kodevs 2019-2020
-print_log(Data):-
-    write(Data).
+print_log(error, FD):- write(FD, "EROR: ").
+print_log(warning, FD):- write(FD, "WARNING: ").
+print_log(info, FD):- write(FD, "INFO: ").
+print_log(debug, FD):- write(FD, "DEBUG: ").
+print_log(Data, FD):- write(FD, Data).
 
 %% show_logs(+List:list) is det
 % 
@@ -49,22 +52,12 @@ print_log(Data):-
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
 show_logs(List):-
+    file_descriptor(append, FD),
     findall(1, (
         member(Data, List),
-        print_log(Data)
-    ), _).
-
-%% show_mode(+ModeName) is det
-% 
-% The show_mode/1 predicate Display the log 
-% mode name
-%
-% @param ModeName Target
-% @copyright 2kodevs 2019-2020
-show_mode(error):- write("EROR: ").
-show_mode(warning):- write("WARNING: ").
-show_mode(info):- write("INFO: ").
-show_mode(debug):- write("DEBUG: ").
+        print_log(Data, FD)
+    ), _),
+    close(FD).
 
 %% valid_log(+ModeName, +List:list) is det
 % 
@@ -78,8 +71,7 @@ valid_log(Mode, List):-
     log_id(Mode, Id),
     log_mode(Current),
     Current >= Id, !,
-    show_mode(Mode),
-    show_logs(List), nl.
+    show_logs([Mode | List]), nl.
 valid_log(_, _).
 
 %% error_log(+List:list) is det
