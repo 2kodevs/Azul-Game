@@ -11,4 +11,9 @@ test(column_of, [nondet]) :-
     column_of(4, blue, R),
     assertion(R=:=4).
 
+test(empty_board, [nondet]) :-
+    empty_board(Data),
+    assertion(Data==[[[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board).
+
 :- end_tests(player).
+

@@ -96,7 +96,7 @@ valid_choices(Game, Player, Choices) :-
 % pattern lines is full, it becomes an empty line.
 %
 % @param Player Target
-% @param Line Patter line id
+% @param Line Pattern line id
 % @param NewPlayer Updated player
 % @copyright 2kodevs 2019-2020
 clean_line(Player, L, NewPlayer) :-
