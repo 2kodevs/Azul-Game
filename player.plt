@@ -16,10 +16,17 @@ test(tile_score, [nondet]) :-
     assertion(Score=:=6).
 
 test(new_players, [nondet]) :-
-    new_players(2, Players),
+    new_players(2, Players:players),
     penalization_list(P),
-    assertion(Players==[[basic:strategy, [[[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board, P:penalties, []:table, 0:score]:1, [basic:strategy, [[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board, P:penalties, []:table, 0:score]:2]:players).
-    
+    strategies(S),
+    findall(Y:Id,
+            ( member(L:Id, Players),
+              member(X:strategy, L),
+              member(X, S),
+              concat([X:strategy], Y, L)
+            ),
+            NewP),
+    assertion(NewP==[[[[[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board, P, []:table, 0:score]:1, [[[[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board, P, []:table, 0:score]:2]).  
 
 test(column_of, [nondet]) :-
     column_of(4, blue, R),
