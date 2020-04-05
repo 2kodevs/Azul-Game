@@ -7,6 +7,20 @@ test(line_score, [nondet]) :-
     line_score([(1, 2),  (2, 3),  (1, 1),  (2, 5),  (2, 4),  (3, 4),  (1, 4)],  (2, 4), Score),
     assertion(Score=:=3).
 
+test(tile_score, [nondet]) :-
+    tile_score(
+               [ [(1, 2),  (2, 3),  (1, 1),  (2, 5),  (2, 4),  (3, 4),  (1, 4),  (3, 5),  (3, 6),  (3, 3)]:table
+               ],
+               (2, 4),
+               Score),
+    assertion(Score=:=6).
+
+test(new_players, [nondet]) :-
+    new_players(2, Players),
+    penalization_list(P),
+    assertion(Players==[[basic:strategy, [[[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board, P:penalties, []:table, 0:score]:1, [basic:strategy, [[empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:1, [[empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:2, [[empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:3, [[empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:4, [[empty, empty, empty, empty, empty]:stocks, [blue, red, yellow, black, white]:valid, [blue, red, yellow, black, white]:all]:5]:board, P:penalties, []:table, 0:score]:2]:players).
+    
+
 test(column_of, [nondet]) :-
     column_of(4, blue, R),
     assertion(R=:=4).
