@@ -347,7 +347,9 @@ clean_players(Game, NewGame) :-
     findall(Player:Id,
             ( member(X:Id, Players),
               property_of(board, X, Board),
-              verify_lines(X, Board, Player)
+              penalization_list(Penalizations),
+              set_prop_to(penalization, X, Penalizations, Y),
+              verify_lines(Y, Board, Player)
             ),
             NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
