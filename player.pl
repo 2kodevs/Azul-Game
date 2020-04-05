@@ -8,6 +8,14 @@
 % @copyright 2kodevs 2019-2020
 penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 
+%% strategies(-strategies:list) is det
+% 
+% The strategies/1 fact return the list of strategies that a player can select
+%
+% @param strategies Return the strategies list
+% @copyright 2kodevs 2019-2020
+strategies([basic]).
+
 %% random_strategy(-Strategy:Functor) is det
 % 
 % The random_strategy/1 predicate return a random play strategy 
@@ -15,7 +23,8 @@ penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 % @param Strategy Functor of one strategy
 % @copyright 2kodevs 2019-2020
 random_strategy(S) :-
-    random_permutation([basic], [S|_]).    
+    strategies(St),
+    random_permutation(St, [S|_]).    
 
 %% line_score(+List:list, +Tile:point, -Score:int) is det
 % 
