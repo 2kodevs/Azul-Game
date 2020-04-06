@@ -88,16 +88,16 @@ column_of(Line, Color, Column) :-
 valid_choices(Game, Player, Choices) :-
     property_of(factories, Game, Fac),
     property_of(board, Player, Board),
-    findall(Lid:Fid:Color,
-            ( property_of(Lid, Board, Line),
-              property_of(stocks, Line, Stocks),
-              member(empty, Stocks),
-              property_of(valid, Line, ValidColors),
-              property_of(Fid, Fac, CurFac),
-              member(Color, ValidColors),
-              member(Color, CurFac)
-            ),
-            Choices).
+    findall(Lid:Fid:Color,( 
+        property_of(Lid, Board, Line),
+        property_of(stocks, Line, Stocks),
+        member(empty, Stocks),
+        property_of(valid, Line, ValidColors),
+        property_of(Fid, Fac, CurFac),
+        member(Color, ValidColors),
+        member(Color, CurFac)
+    ), Choices),
+    not(length(Choices, 0)).    
 
 %% available_colors(+Game:Game, -Choices:list) is det
 % 
@@ -109,13 +109,13 @@ valid_choices(Game, Player, Choices) :-
 % @copyright 2kodevs 2019-2020
 available_colors(Game, Choices) :-
     property_of(factories, Game, Fac),
-    findall(Count:Fid:Color,
-            ( property_of(Fid, Fac, F),
-              member(Color, F),
-              Color \= empty,
-              count(F, Color, Count)
-            ),
-            Choices).
+    findall(Count:Fid:Color, ( 
+        property_of(Fid, Fac, F),
+        member(Color, F),
+        Color \= empty,
+        count(F, Color, Count)
+    ), Choices),
+    not(length(Choices, 0)).  
 
 %% clean_line(+Player:Player, +LineId:int, -NewPlayer:Player) is semidet
 % 
@@ -297,7 +297,7 @@ basic(Game, Player, NewGame, NewPlayer, A) :-
     update_player(Player, Game, A, NewPlayer, Return),
     update_game(Game, A, NewGame, Return).
 basic(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
-    available_colors(Game, [Amount:Id:Color | _]),
+    available_colors(Game, [Amount:Id:Color | _]), !,
     update_game(Game, none:Id:Color, NewGame, Amount),
     Neg is Amount* -1,
     penalize(Player, Neg, NewPlayer).
@@ -326,7 +326,7 @@ greedy(Game, Player, NewGame, NewPlayer, A) :-
     concat(_, [_:A:NewPlayer:Return], Sorted),
     update_game(Game, A, NewGame, Return).
 greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
-    available_colors(Game, Choises),
+    available_colors(Game, Choises), !,
     sort(Choises, [Amount:Id:Color | _]),
     update_game(Game, none:Id:Color, NewGame, Amount),
     Neg is Amount* -1,
