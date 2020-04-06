@@ -158,7 +158,7 @@ set_log_mode(Mode) :-
 set_log_file(Dir):-
     log_dir(OldDir),
     retract(log_dir(OldDir)),
-    asserta(log_mode(Dir)), !.
+    asserta(log_dir(Dir)), !.
 
 %% file_descriptor(+Mode, -FileDescriptor) is det
 % 
