@@ -39,17 +39,25 @@ log_id(debug, 4).
 % @param Data Output Target
 % @param FileDescriptor File Target
 % @copyright 2kodevs 2019-2020
-print_log(error, FD):- write(FD, "ERROR: "), !.
-print_log(warning, FD):- write(FD, "WARNING: "), !.
-print_log(info, FD):- write(FD, "INFO: "), !.
-print_log(debug, FD):- write(FD, "DEBUG: "), !.
-print_log(Data:factories, FD) :-
+print_log(error, FD) :-
+    write(FD, "ERROR: "), !.
+print_log(warning, FD) :-
+    write(FD, "WARNING: "), !.
+print_log(info, FD) :-
+    write(FD, "INFO: "), !.
+print_log(debug, FD) :-
+    write(FD, "DEBUG: "), !.
+print_log(Facs:factories, FD) :-
+    property_of(center, Facs, Center),
+    remove_prop(center, Facs, Data),
     findall(V, member(V:_, Data), L),
     concat_all(L, NewData),
     split_fac(2, 0, NewData, [], [], [Top, Bottom]),
     length(NewData, Len),
     make_space(7, '', S),
     Times is Len/4,
+    write(FD, "Factories:"),
+    nl(FD),
     print_symbol(Times, S, ++++++++++++++++++, FD),
     nl(FD),
     format_fac(1, Top, FD),
@@ -57,12 +65,22 @@ print_log(Data:factories, FD) :-
     format_fac(1, Bottom, FD),
     nl(FD), !,
     print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD),
+    nl(FD),
+    write(FD, "Center:"),
+    nl(FD),
+    length(Center, LenC),
+    NewTimes is round(LenC*8+3),
+    print_symbol(NewTimes, "", +, FD),
+    nl(FD),
+    write(FD, '| '),
+    format_fac(3, Center, FD),
+    write(FD, '|'),
+    nl(FD),
+    print_symbol(NewTimes, "", +, FD),
     nl(FD), !.
 print_log(Data, FD) :-
     write(FD, Data).
-    nl(FD),
-    print_symbol(Times, S, ++++++++++++++++++, FD), !.
-print_log(Data, FD):- write(FD, Data).
 
 %% show_logs(+List:list) is det
 % 
@@ -73,11 +91,13 @@ print_log(Data, FD):- write(FD, Data).
 % @copyright 2kodevs 2019-2020
 show_logs(List) :-
     file_descriptor(append, FD),
-    findall(1, (
-        member(Data, List),
-        print_log(Data, FD)
-    ), _),
-    nl(FD), close(FD).
+    findall(1,
+            ( member(Data, List),
+              print_log(Data, FD)
+            ),
+            _),
+    nl(FD),
+    close(FD).
 
 %% valid_log(+ModeName, +List:list) is det
 % 
@@ -90,8 +110,8 @@ show_logs(List) :-
 valid_log(Mode, List) :-
     log_id(Mode, Id),
     log_mode(Current),
-    Current >= Id, !,
-    show_logs([Mode | List]).
+    Current>=Id, !,
+    show_logs([Mode|List]).
 valid_log(_, _).
 
 %% error_log(+List:list) is det
@@ -160,7 +180,7 @@ set_log_mode(Mode) :-
 %
 % @param FileDir File to use for store the logs
 % @copyright 2kodevs 2019-2020
-set_log_file(Dir):-
+set_log_file(Dir) :-
     log_dir(OldDir),
     retract(log_dir(OldDir)),
     asserta(log_mode(Dir)), !.

@@ -337,6 +337,14 @@ format_fac(2, [X|Line], FD) :-
     write(FD, S),
     write(FD, '|  ---  '),
     format_fac(1, Line, FD).
+format_fac(3, [X|Line], FD) :-
+    atom_string(X, SX),
+    atom_length(X, Len),
+    Y is 6-Len,
+    make_space(Y, '  ', S),
+    write(FD, SX),
+    write(FD, S),
+    format_fac(3, Line, FD).
 
 %% make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
 % 
