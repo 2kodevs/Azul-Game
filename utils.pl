@@ -269,17 +269,6 @@ indexed_sort(L, R) :-
             property_of(X, O, Y),
             R).
 
-% Maybe will never use this, not erase until job done
-split_lines(_, [], Acum, [Acum]).
-split_lines(Len, [X|Lines], Acum, SL) :-
-    length(Acum, Cur),
-    Cur<Len,
-    concat(Acum, [X], NewAcum),
-    split_lines(Len, Lines, NewAcum, SL), !.
-split_lines(Len, Lines, Acum, [Acum, B|SL]) :-
-    split_lines(Len, Lines, [], TempSL),
-    concat(B, SL, TempSL).   
-
 %% split_fac(+Row_Length:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is <unknown>
 % 
 % The split_fac/6 predicate return the elements of the factories sorted in two sides,
@@ -375,20 +364,21 @@ format_fac(4, Center, FD) :-
     print_symbol(NewTimes, "", +, FD),
     nl(FD).
 
-%% format_PL(+List:List, +FD:File-Descriptor) is <unknown>
+%% format_cell(+List:List, +FD:File-Descriptor) is <unknown>
 % 
-% The format_fac/3 predicate prints the pattern line
+% The format_cell/3 predicate prints a list of elements in the 
+% following format: | <item1>  <item2>  ... <itemN> |
 % 
 % @param List Elements container
 % @param FD File descriptor for where to write
 % @copyright 2kodevs 2019-2020
-format_PL([], _).
-format_PL([L|PL], FD) :-
+format_cell([], _).
+format_cell([L|PL], FD) :-
     write(FD, '| '),
     format_fac(3, L, FD),
     write(FD, '|'),
     nl(FD),
-    format_PL(PL, FD).
+    format_cell(PL, FD).
 
 %% make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
 % 
