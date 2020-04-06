@@ -26,7 +26,7 @@ The previous rule run a standard game of 4 players and 9 factories. To modify th
 make run players=3 fac=5
 ```
 
-After that you could see the description of th game events in `log.log` file by default but this behaivior is modifiable use the `file` variable. If you need more details about the game events change the variable `level` to debug:
+After that you could see the description of the game events in `log.log` file by default, but this behavior is modifiable using the `file` variable. If you need more details about the game events, change the variable `level` to **debug**:
 ```
 make run file=myfile.log level=debug
 ```
