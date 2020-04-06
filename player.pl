@@ -1,4 +1,4 @@
-:- [utils].
+:- [utils, logs].
 
 %% penalization_list(-Penalizations:list) is det
 % 
@@ -141,6 +141,7 @@ update_score(Player,  (L, C), NewPlayer, Return) :-
     property_of(L, Board, Line),
     property_of(stocks, Line, Stocks),
     count(Stocks, empty, 0), !,
+    info_log(["Player fulfilled the row ", L, " of his pattern lines"]),
     Return is L-1,
     tile_score(Player,  (L, C), Score),
     property_of(score, Player, PScore),
@@ -171,6 +172,7 @@ update_line(Player, Game, L:F:Color, NewPlayer, Diff) :-
     count(Fac, Color, Amount),
     Diff is min(Empty-Amount, 0),
     replace(Stocks, Amount, empty, Color, NewStocks),
+    debug_log(["Player new pattern line ", L, " is -> ", NewStocks]),
     set_prop_to(stocks, Line, NewStocks, NewLine),
     set_prop_to(valid, NewLine, [Color], ValidLine),
     set_prop_to(L, Board, ValidLine, NewBoard),
@@ -185,6 +187,7 @@ update_line(Player, Game, L:F:Color, NewPlayer, Diff) :-
 % @param NewPlayer Updated player
 % @copyright 2kodevs 2019-2020
 update_table(Player, Tile, NewPlayer) :-
+    debug_log(["Adding <", Tile, "> to the player table"]),
     property_of(table, Player, Table),
     add(Table, 1, Tile, NewTable),
     set_prop_to(table, Player, NewTable, NewPlayer).
@@ -204,6 +207,7 @@ penalize(Player, Amount, NewPlayer) :-
     length(Penalties, Sz),
     Sz>0, !,
     concat([P1], R, Penalties),
+    debug_log(["Player recive ", P1, " of penalization"]),
     set_prop_to(penalties, Player, R, TempPlayer1),
     property_of(score, Player, Score),
     NewScore is max(Score+P1, 0),
@@ -247,7 +251,7 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
     property_of(F, GameFac, Fac),
     findall(X,
             ( member(X, Fac),
-              not(member(X, [empty, C]))
+              not(member(X, [empty, first, C]))
             ),
             ToCenter),
     add([], 4, empty, NewFac),
@@ -255,6 +259,7 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
     property_of(center, TempFacs, Center),
     concat(ToCenter, Center, NewCenter),
     set_prop_to(center, TempFacs, NewCenter, NewFacs),
+    debug_log(["New factories center is -> ", NewCenter]),
     set_prop_to(factories, Game, NewFacs, Temp),
     property_of(outs, Game, Outs),
     property_of(C, Outs, Number),
@@ -337,8 +342,24 @@ new_players(Amount, Players:players) :-
 run_round(G, [], G, []).
 run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
     property_of(strategy, P1, St),
-    Choice=..[St, Game, P1, TempGame1, NewP1, _:Fid:_],
+    info_log(["Player ", Id, " turn start --------------------"]),
+    Choice=..[St, Game, P1, TempGame1, NewP1, Lid:Fid:Color],
     Choice,
+    info_log(
+             [ "Player choose all type ",
+               Color,
+               " from expositor ",
+               Fid,
+               " and add them to the ",
+               Lid,
+               " line"
+             ]),
+    property_of(factories, Game, Facs),
+    debug_log([Facs:factories]),
+    info_log(
+             [ NewP1:pattern,
+               "\n----------------------------------------------"
+             ]),
     property_of(players, TempGame1, OldPlayers),
     set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),
@@ -356,7 +377,10 @@ clean_players(Game, NewGame) :-
     findall(Player:Id,
             ( member(X:Id, Players),
               property_of(board, X, Board),
-              verify_lines(X, Board, Player)
+              verify_lines(X, Board, CleanedPlayer),
+              info_log([[CleanedPlayer:player, Id:id]:player]),
+              penalization_list(Penalizations),
+              set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
             ),
             NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
