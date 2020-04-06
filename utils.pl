@@ -310,6 +310,22 @@ split_fac(Len, _, Data, Top, Bottom, [T, B]) :-
 % @param FD File descriptor for where to write
 % @copyright 2kodevs 2019-2020
 format_fac(_, [], _) :- !.
+format_fac(0, Data, FD) :-
+    split_fac(2, 0, Data, [], [], [Top, Bottom]),
+    length(Data, Len),
+    make_space(7, '', S),
+    Times is Len/4,
+    nl(FD),
+    write(FD, "Factories:"),
+    nl(FD),
+    print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD),
+    format_fac(1, Top, FD),
+    nl(FD),
+    format_fac(1, Bottom, FD),
+    nl(FD),
+    print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD).
 format_fac(1, [X|Line], FD) :-
     atom_string(X, SX),
     atom_length(X, Len),
@@ -345,6 +361,35 @@ format_fac(3, [X|Line], FD) :-
     write(FD, SX),
     write(FD, S),
     format_fac(3, Line, FD).
+format_fac(4, Center, FD) :-
+    nl(FD),
+    write(FD, "Center:"),
+    nl(FD),
+    length(Center, LenC),
+    NewTimes is round(LenC*8+3),
+    print_symbol(NewTimes, "", +, FD),
+    nl(FD),
+    write(FD, '| '),
+    format_fac(3, Center, FD),
+    write(FD, '|'),
+    nl(FD),
+    print_symbol(NewTimes, "", +, FD),
+    nl(FD).
+
+%% format_PL(+List:List, +FD:File-Descriptor) is <unknown>
+% 
+% The format_fac/3 predicate prints the pattern line
+% 
+% @param List Elements container
+% @param FD File descriptor for where to write
+% @copyright 2kodevs 2019-2020
+format_PL([], _).
+format_PL([L|PL], FD) :-
+    write(FD, '| '),
+    format_fac(3, L, FD),
+    write(FD, '|'),
+    nl(FD),
+    format_PL(PL, FD).
 
 %% make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
 % 

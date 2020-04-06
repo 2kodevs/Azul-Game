@@ -52,33 +52,25 @@ print_log(Facs:factories, FD) :-
     remove_prop(center, Facs, Data),
     findall(V, member(V:_, Data), L),
     concat_all(L, NewData),
-    split_fac(2, 0, NewData, [], [], [Top, Bottom]),
-    length(NewData, Len),
-    make_space(7, '', S),
-    Times is Len/4,
-    write(FD, "Factories:"),
+    format_fac(0, NewData, FD),
+    format_fac(4, Center, FD), !.
+print_log(B:board, FD) :-
     nl(FD),
-    print_symbol(Times, S, ++++++++++++++++++, FD),
+    property_of(stocks, B, PL),
+    findall(Line,
+            ( member(X:Id, PL),
+              Times is 5-Id,
+              add(X, Times, '  -', Line)
+            ),
+            Lines),
+    write(FD, "               Pattern Line                "),
     nl(FD),
-    format_fac(1, Top, FD),
+    write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
     nl(FD),
-    format_fac(1, Bottom, FD),
-    nl(FD), !,
-    print_symbol(Times, S, ++++++++++++++++++, FD),
-    nl(FD),
-    nl(FD),
-    write(FD, "Center:"),
-    nl(FD),
-    length(Center, LenC),
-    NewTimes is round(LenC*8+3),
-    print_symbol(NewTimes, "", +, FD),
-    nl(FD),
-    write(FD, '| '),
-    format_fac(3, Center, FD),
-    write(FD, '|'),
-    nl(FD),
-    print_symbol(NewTimes, "", +, FD),
+    format_PL(Lines, FD),
+    write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
     nl(FD), !.
+
 print_log(Data, FD) :-
     write(FD, Data).
 
