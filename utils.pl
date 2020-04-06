@@ -411,3 +411,50 @@ print_symbol(Times, Space, Symb, FD) :-
     write(FD, Space),
     print_symbol(NewTimes, Space, Symb, FD).
 
+%% format_players(+List:List, +FD:File-Descriptor) is <unknown>
+% 
+% The format_players/3 predicate prints the score and the strategy
+% of players in List
+% 
+% @param List Elements container
+% @param FD File descriptor for where to write
+% @copyright 2kodevs 2019-2020
+format_players([], _).
+format_players([P:Score|Players], FD) :-
+    property_of(id, P, Id),
+    write(FD, 'Player '),
+    write(FD, Id),
+    write(FD, ' --- score: '),
+    write(FD, Score),
+    write(FD, ' --- strategy: '),
+    property_of(strategy, P, St),
+    write(FD, St),
+    nl(FD),
+    format_players(Players, FD).
+
+%% fill_table(+Point:(X:Int, Y:Int), +Table:List, +Acum:List, +FD:File-Descriptor) is <unknown>
+% 
+% The fill_table/4 predicate prints the score and the strategy
+% of players in List
+% 
+% @param Point Coordinate of the actual tile
+% @param Table Wall with tiles
+% @param Acum List where the elements of a row are going to be acumulated  
+% @param FD File descriptor for where to write
+% @copyright 2kodevs 2019-2020
+fill_table((6, 1), _, R, R).
+fill_table((X, 6), Table, Acum, [Acum|R]) :-
+    NewX is X+1,
+    fill_table((NewX, 1), Table, [], R), !.
+fill_table((X, Y), Table, Acum, R) :-
+    member((X, Y), Table), !,
+    tiles_colors(Colors),
+    Index is Y-1,
+    index_of(C, Colors, Index),
+    concat(Acum, [C], NewAcum),
+    NewY is Y+1,
+    fill_table((X, NewY), Table, NewAcum, R).
+fill_table((X, Y), Table, Acum, R) :-
+    concat(Acum, ['  -'], NewAcum),
+    NewY is Y+1,
+    fill_table((X, NewY), Table, NewAcum, R).    
