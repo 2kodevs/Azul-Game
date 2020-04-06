@@ -112,7 +112,7 @@ debug_log(List):- valid_log(debug, List).
 % The set_log_mode/1 predicate set the logger  
 % system mode to ModeName.
 %
-% @param Dir Return the name of the current log file
+% @param ModeName Mode target
 % @copyright 2kodevs 2019-2020
 set_log_mode(Mode):-
     log_id(Mode, NewId),
@@ -159,3 +159,14 @@ project_info :-
     writeln(FD, "Azul-Game Developed by 2kodevs"),
     writeln(FD, "See us at https://github.com/2kodevs/"),
     nl(FD), close(FD).
+
+%% set_log_mode_by_id(+ModeId) is det
+% 
+% The set_log_mode_by_id/1 predicate set the logger  
+% system mode to the mode with id ModeId.
+%
+% @param ModeId Id of Mode target
+% @copyright 2kodevs 2019-2020
+set_log_mode_by_id(Id):-
+    log_id(Mode, Id),
+    set_log_mode(Mode).
