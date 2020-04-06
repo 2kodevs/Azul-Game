@@ -1,3 +1,6 @@
+run:
+	@swipl -t main -s game.pl
+    
 test: ## Run tests
 	swipl -t "load_test_files([]), run_tests." -s game.pl
 
