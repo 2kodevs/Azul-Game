@@ -99,6 +99,24 @@ valid_choices(Game, Player, Choices) :-
             ),
             Choices).
 
+%% available_colors(+Game:Game, -Choices:list) is det
+% 
+% The valid_choices/3 predicate given a Game find all
+% factories selections.
+%
+% @param Game A running Game
+% @param Choices All the player possible factories selections
+% @copyright 2kodevs 2019-2020
+available_colors(Game, Choices) :-
+    property_of(factories, Game, Fac),
+    findall(Count:Fid:Color,
+            ( property_of(Fid, Fac, F),
+              member(Color, F),
+              Color \= empty,
+              count(F, Color, Count)
+            ),
+            Choices).
+
 %% clean_line(+Player:Player, +LineId:int, -NewPlayer:Player) is semidet
 % 
 % The clean_line/3 predicate if the line numbered LineId of the player 
@@ -233,7 +251,7 @@ update_player(Player, Game, L:F:Color, NewPlayer, Return) :-
     Return is Amount-Diff,
     penalize(TempPlayer1, Diff, NewPlayer).
 
-%% update_game(+Game:Game, +Selection, -NewGame:Game, -ReturnedTiles:int) is det
+%% update_game(+Game:Game, +Selection, -NewGame:Game, +ReturnedTiles:int) is det
 % 
 % The update_game/4 predicate update all the game information after a player turn
 %
@@ -279,13 +297,7 @@ basic(Game, Player, NewGame, NewPlayer, A) :-
     update_player(Player, Game, A, NewPlayer, Return),
     update_game(Game, A, NewGame, Return).
 basic(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
-    property_of(factories, Game, Factories),
-    property_of(Id, Factories, F),
-    count(F, empty, C),
-    not(length(F, C)),
-    member(Color, F),
-    Color\=empty, !,
-    count(F, Color, Amount),
+    available_colors(Game, [Amount:Id:Color | _]),
     update_game(Game, none:Id:Color, NewGame, Amount),
     Neg is Amount* -1,
     penalize(Player, Neg, NewPlayer).
