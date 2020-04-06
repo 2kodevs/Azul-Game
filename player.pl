@@ -14,7 +14,7 @@ penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 %
 % @param Strategies Return the strategies list
 % @copyright 2kodevs 2019-2020
-strategies([basic]).
+strategies([basic, greedy]).
 
 %% random_strategy(-Strategy:Functor) is det
 % 
@@ -302,6 +302,36 @@ basic(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     Neg is Amount* -1,
     penalize(Player, Neg, NewPlayer).
 basic(Game, Player, Game, Player, none:none:none).
+
+%% greedy(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
+% 
+% The greedy/5 predicate is a player strategy. At the beginning find all the valid choices
+% and take the one wich maximize the score. If its not possible, then choose the tiles that
+% minimize the penalizaton factories,  skip the turn. 
+%
+% @param Game Current Game
+% @param Player Current Player
+% @param NewGame Updated game
+% @param NewPlayer Updated Player
+% @param Selection Player choice Line:Factory:Color
+% @copyright 2kodevs 2019-2020
+greedy(Game, Player, NewGame, NewPlayer, A) :-
+    valid_choices(Game, Player, Choises), !,
+    findall(Score:Choise:TempPlayer:Return, (
+        member(Choise, Choises),
+        update_player(Player, Game, Choise, TempPlayer, Return),
+        property_of(score, TempPlayer, Score)    
+    ), Options),
+    sort(Options, Sorted),
+    concat(_, [_:A:NewPlayer:Return], Sorted),
+    update_game(Game, A, NewGame, Return).
+greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
+    available_colors(Game, Choises),
+    sort(Choises, [Amount:Id:Color | _]),
+    update_game(Game, none:Id:Color, NewGame, Amount),
+    Neg is Amount* -1,
+    penalize(Player, Neg, NewPlayer).
+greedy(Game, Player, Game, Player, none:none:none).
 
 %% empty_board(+Board:Board) is det
 % 
