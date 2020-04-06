@@ -98,7 +98,7 @@ new_round(Game, NewGame) :-
     enumerate(TempFac, 1, EnumFac),
     set_prop_to(center, EnumFac, [], AllFac),
     set_prop_to(factories, TempGame2, AllFac, NewGame),
-    info_log(["Starting new round.\n\t", AllFac:factories]).
+    info_log(["Starting new round. Factories distribution:\n", AllFac:factories]).
 
 %% any_full_row(+Player:Player, -Rows:Game) is semidet
 % 

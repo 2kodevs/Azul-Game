@@ -55,9 +55,8 @@ print_log(Data:factories, FD) :-
     format_fac(1, Top, FD),
     nl(FD),
     format_fac(1, Bottom, FD),
-    nl(FD), !,
-    print_symbol(Times, S, ++++++++++++++++++, FD),
-    nl(FD), !.
+    nl(FD),
+    print_symbol(Times, S, ++++++++++++++++++, FD), !.
 print_log(Data, FD):- write(FD, Data).
 
 %% show_logs(+List:list) is det
