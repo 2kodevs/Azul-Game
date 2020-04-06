@@ -1,4 +1,4 @@
-:- [player].
+:- [player, logs].
 :- (dynamic initial_player/1).
 
 %% initial_player(-Id:int) is det
@@ -47,6 +47,7 @@ populate(Game, NewGame) :-
     % check if the tiles could full the factories
     Sum<FacSz*4, !,
     property_of(outs, Game, Outs),
+    debug_log(["Adding more tiles to the bag.\n\t", Amounts:amounts, "\n\t", Outs:outs]),
     % adding tiles to the bag
     findall(RealAmount:Color,
             ( property_of(Color, Amounts, QAmount),
@@ -68,6 +69,7 @@ populate(Game, Game).
 % @param NewGame The new Game ready to run a new round
 % @copyright 2kodevs 2019-2020
 new_round(Game, NewGame) :-
+    debug_log(["Prepairing a new round"]),
     % Check if more tiles are needed
     populate(Game, TempGame1),
     %Select the random tiles to add
@@ -95,7 +97,8 @@ new_round(Game, NewGame) :-
     set_prop_to(amounts, TempGame1, NewAmounts, TempGame2),
     enumerate(TempFac, 1, EnumFac),
     set_prop_to(center, EnumFac, [], AllFac),
-    set_prop_to(factories, TempGame2, AllFac, NewGame).
+    set_prop_to(factories, TempGame2, AllFac, NewGame),
+    info_log(["Starting new round.\n\t", AllFac:factories]).
 
 %% any_full_row(+Player:Player, -Rows:Game) is semidet
 % 
@@ -284,6 +287,12 @@ end_or_continue(Game, Events, NewGame) :-
     property_of(players, Game, Players),
     property_of(NewId, Players, FirstPlayer),
     penalize(FirstPlayer, -1, NewFirstP),
+    info_log([
+        "Player ", 
+        NewId, 
+        " will be the first at the next round. ",
+        "Cause that recive a penalization\n"
+    ]),
     set_prop_to(NewId, Players, NewFirstP, NewPlayers),
     set_prop_to(players, Game, NewPlayers, TempGame1),
     new_round(TempGame1, TempGame2),
@@ -310,7 +319,13 @@ calculate_scores(Game, NewGame) :-
 
 
 main :-
+    project_info,
+    info_log(["Preparing a 4 players Game"]),
     new_game(Game),
     new_round(Game, NewGame),
-    run(NewGame, [], _), !. 
-    % TODO: Print the winner
+    run(NewGame, [], EndedGame), !, 
+    info_log(["The game ends. Who will be the winner??\n", EndedGame:scores]),
+    writeln("true.").
+main :- 
+    error_log(["An unexpected failure occur"]),
+    writeln("fail.").
