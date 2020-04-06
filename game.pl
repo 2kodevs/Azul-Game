@@ -319,7 +319,9 @@ calculate_scores(Game, NewGame) :-
     set_prop_to(players, Game, NewPlayers, NewGame).
 
 
-main :-
+main(Level, File) :-
+    set_log_mode(Level),
+    set_log_file(File),
     project_info,
     info_log(["Preparing a 4 players Game"]),
     new_game(Game),
@@ -327,6 +329,6 @@ main :-
     run(NewGame, [], EndedGame), !, 
     info_log(["The game ends. Who will be the winner??\n", EndedGame:scores]),
     writeln("true.").
-main :- 
+main(_, _) :- 
     error_log(["An unexpected failure occur"]),
     writeln("fail.").

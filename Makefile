@@ -1,9 +1,12 @@
+level 	= info
+file 	= log.log
+
 run:
-	@swipl -t main -s game.pl
+	@swipl -t "main($(level), \"$(file)\")" -s game.pl
     
 test: ## Run tests
 	swipl -t "load_test_files([]), run_tests." -s game.pl
-
+ 
 coverage: ## Run tests and display coverage
 	swipl -t "use_module(library(test_cover)), load_test_files([]), show_coverage(run_tests)." -s utils.pl -s game.pl
 
