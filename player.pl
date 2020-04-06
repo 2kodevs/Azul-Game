@@ -378,7 +378,7 @@ clean_players(Game, NewGame) :-
             ( member(X:Id, Players),
               property_of(board, X, Board),
               verify_lines(X, Board, CleanedPlayer),
-              info_log([CleanedPlayer:player]),
+              info_log([[CleanedPlayer:player, Id:id]:player]),
               penalization_list(Penalizations),
               set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
             ),
