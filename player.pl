@@ -251,7 +251,7 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
     property_of(F, GameFac, Fac),
     findall(X,
             ( member(X, Fac),
-              not(member(X, [empty, C]))
+              not(member(X, [empty, ligth_green, C]))
             ),
             ToCenter),
     add([], 4, empty, NewFac),

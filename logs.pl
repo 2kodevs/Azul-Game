@@ -39,14 +39,10 @@ log_id(debug, 4).
 % @param Data Output Target
 % @param FileDescriptor File Target
 % @copyright 2kodevs 2019-2020
-print_log(error, FD) :-
-    write(FD, "ERROR: ").
-print_log(warning, FD) :-
-    write(FD, "WARNING: ").
-print_log(info, FD) :-
-    write(FD, "INFO: ").
-print_log(debug, FD) :-
-    write(FD, "DEBUG: ").
+print_log(error, FD):- write(FD, "ERROR: "), !.
+print_log(warning, FD):- write(FD, "WARNING: "), !.
+print_log(info, FD):- write(FD, "INFO: "), !.
+print_log(debug, FD):- write(FD, "DEBUG: "), !.
 print_log(Data:factories, FD) :-
     findall(V, member(V:_, Data), L),
     concat_all(L, NewData),
@@ -64,6 +60,9 @@ print_log(Data:factories, FD) :-
     nl(FD), !.
 print_log(Data, FD) :-
     write(FD, Data).
+    nl(FD),
+    print_symbol(Times, S, ++++++++++++++++++, FD), !.
+print_log(Data, FD):- write(FD, Data).
 
 %% show_logs(+List:list) is det
 % 
