@@ -21,7 +21,7 @@ To execute the project, just open the console from the root location of the proj
 ```
 make run
 ```
-The previous rule run a standar game of 4 players and 9 factories. To modify this values use change the Makefile parameters:
+The previous rule run a standard game of 4 players and 9 factories. To modify this values change the Makefile parameters:
 ```
 make run players=3 fac=5
 ```
