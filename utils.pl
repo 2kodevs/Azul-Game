@@ -223,7 +223,7 @@ replace(L, T, V, N, R) :-
 % @param Index The index of Value in List
 % @copyright 2kodevs 2019-2020
 index_of(V, L, I) :-
-    concat(A, [V|_], L), !,
+    concat(A, [V|_], L),
     length(A, I).
 index_of(_, _, -1).
 
