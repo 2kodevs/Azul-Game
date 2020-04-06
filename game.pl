@@ -310,7 +310,7 @@ calculate_scores(Game, NewGame) :-
     findall(NewPlayer:Id,
             ( property_of(Id, Players, Player),
               table_score(Player, TableScore),
-              property_of(score, player, Score),
+              property_of(score, Player, Score),
               NewScore is Score+TableScore,
               set_prop_to(score, Player, NewScore, NewPlayer)
             ),
