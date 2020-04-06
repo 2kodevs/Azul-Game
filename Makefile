@@ -15,5 +15,10 @@ coverage: ## Run tests and display coverage
 install: ## Install dependencies
 	sudo apt-get install swi-prolog
 
+doc: ## Mount the documentation server
+	@echo Open the server at http://localhost:$(port)/azul/help
+	@echo Close the below process when you read the documentation
+	@swipl -g "use_module(library(http/http_path)), doc_server($(port))" -s game.pl
+
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-%]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
