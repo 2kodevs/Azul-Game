@@ -96,9 +96,10 @@ new_round(Game, NewGame) :-
             NewAmounts),
     set_prop_to(amounts, TempGame1, NewAmounts, TempGame2),
     enumerate(TempFac, 1, EnumFac),
-    set_prop_to(center, EnumFac, [], AllFac),
+    set_prop_to(center, EnumFac, [ligth_green], AllFac),
     set_prop_to(factories, TempGame2, AllFac, NewGame),
-    info_log(["Starting new round. Factories distribution:\n", AllFac:factories]).
+    % TODO: [stdevAntiD2ta] See what is happen when pass AllFac:factories, instead of AllFac in the next line
+    info_log(["Starting new round. Factories distribution:\n", AllFac]).
 
 %% any_full_row(+Player:Player, -Rows:Game) is semidet
 % 
