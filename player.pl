@@ -8,11 +8,11 @@
 % @copyright 2kodevs 2019-2020
 penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 
-%% strategies(-strategies:list) is det
+%% strategies(-Strategies:list) is det
 % 
 % The strategies/1 fact return the list of strategies that a player can select
 %
-% @param strategies Return the strategies list
+% @param Strategies Return the strategies list
 % @copyright 2kodevs 2019-2020
 strategies([basic]).
 
