@@ -7,7 +7,7 @@ To use the project, clone it or download it to your local computer.
 
 
 ### Requirements 📋
-It is necessary to have `swi-prolog`, to use the project rules for run the game and the test suit. 
+It is necessary to have `swi-prolog`, version `7.6.4`, to use the project rules to run the game and the test suit. 
 
 To install the depencies run:
 ```
