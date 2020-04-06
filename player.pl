@@ -322,13 +322,17 @@ basic(Game, Player, Game, Player, none:none:none).
 % @copyright 2kodevs 2019-2020
 greedy(Game, Player, NewGame, NewPlayer, A) :-
     valid_choices(Game, Player, Choises), !,
-    findall(Score:Choise:TempPlayer:Return, (
+    log_mode(ModeId),
+    set_log_mode(warning),
+    findall(Score:Choise, (
         member(Choise, Choises),
-        update_player(Player, Game, Choise, TempPlayer, Return),
+        update_player(Player, Game, Choise, TempPlayer, _),
         property_of(score, TempPlayer, Score)    
     ), Options),
     sort(Options, Sorted),
-    concat(_, [_:A:NewPlayer:Return], Sorted),
+    concat(_, [_:A], Sorted),
+    set_log_mode_by_id(ModeId),
+    update_player(Player, Game, A, NewPlayer, Return),
     update_game(Game, A, NewGame, Return).
 greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     available_colors(Game, Choises), !,
