@@ -251,7 +251,7 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
     property_of(F, GameFac, Fac),
     findall(X,
             ( member(X, Fac),
-              not(member(X, [empty, ligth_green, C]))
+              not(member(X, [empty, first, C]))
             ),
             ToCenter),
     add([], 4, empty, NewFac),
@@ -345,13 +345,21 @@ run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
     info_log(["Player ", Id, " turn start --------------------"]),
     Choice=..[St, Game, P1, TempGame1, NewP1, Lid:Fid:Color],
     Choice,
-    info_log([
-        "Player chose all color ", 
-        Color, " from factory ",
-        Fid, " and add them to the ",
-        Lid, " line"
-    ]),
-    info_log([NewP1:pattern, "\n----------------------------------------------"]),
+    info_log(
+             [ "Player choose all type ",
+               Color,
+               " from expositor ",
+               Fid,
+               " and add them to the ",
+               Lid,
+               " line"
+             ]),
+    property_of(factories, Game, Facs),
+    debug_log([Facs:factories]),
+    info_log(
+             [ NewP1:pattern,
+               "\n----------------------------------------------"
+             ]),
     property_of(players, TempGame1, OldPlayers),
     set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),
