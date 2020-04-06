@@ -1,8 +1,10 @@
 level 	= info
 file 	= log.log
+players = 4
+fac		= 9
 
-run:
-	@swipl -t "main($(level), \"$(file)\")" -s game.pl
+run: ## Run the game
+	@swipl -t "main($(level), \"$(file)\", $(players), $(fac))" -s game.pl
     
 test: ## Run tests
 	swipl -t "load_test_files([]), run_tests." -s game.pl
