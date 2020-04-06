@@ -54,23 +54,58 @@ print_log(Facs:factories, FD) :-
     concat_all(L, NewData),
     format_fac(0, NewData, FD),
     format_fac(4, Center, FD), !.
-print_log(B:board, FD) :-
+print_log(Game:center, FD) :-
+    property_of(factories, Game, Facs),
+    property_of(center, Facs, Center),
+    format_fac(4, Center, FD).
+print_log(Player:pattern, FD) :-
     nl(FD),
-    property_of(stocks, B, PL),
-    findall(Line,
-            ( member(X:Id, PL),
+    property_of(board, Player, B),
+    findall(PL:Id,
+            ( member(X:Id, B),
+              property_of(stocks, X, Stocks),
               Times is 5-Id,
-              add(X, Times, '  -', Line)
+              add(Stocks, Times, '  -', PL)
             ),
-            Lines),
+            RawLines),
+    indexed_sort(RawLines, LinesSorted),
+    findall(Line, member(Line:_, LinesSorted), Lines),
     write(FD, "               Pattern Line                "),
     nl(FD),
     write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
     nl(FD),
-    format_PL(Lines, FD),
+    format_cell(Lines, FD),
+    write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"), !.
+print_log(Game:scores, FD) :-
+    property_of(players, Game, Players),
+    nl(FD),
+    findall([Id:id, Strategy:strategy]:Score,
+            ( member(X:Id, Players),
+              property_of(score, X, Score),
+              property_of(strategy, X, Strategy)
+            ),
+            PlayersInverted),
+    indexed_sort(PlayersInverted, PlayersSorted),
+    reverse(PlayersSorted, P),
+    format_players(P, FD), !.
+print_log(Data:player, FD) :-
+    property_of(player, Data, Player),
+    property_of(table, Player, RawTable),
+    sort(RawTable, Table),
+    fill_table((1, 1), Table, [], FTable),
+    nl(FD),
+    property_of(id, Data, Id),
+    string_concat("~~~~~~~~~~~~", "Player ", S1),
+    string_concat(Id, " --- Wall~~~~~~~~~~~~~~", S2),
+    string_concat(S1, S2, S3),
+    write(FD, S3),
+    nl(FD),
+    format_cell(FTable, FD),
     write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
-    nl(FD), !.
-
+    nl(FD),
+    property_of(score, Player, Score),
+    property_of(strategy, Player, St),
+    format_players([[Id:id, St:strategy]:Score], FD), !.
 print_log(Data, FD) :-
     write(FD, Data).
 
