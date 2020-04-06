@@ -1,6 +1,6 @@
 :- [utils].
-:- dynamic log_dir/1.
-:- dynamic log_mode/1.
+:- (dynamic log_dir/1).
+:- (dynamic log_mode/1).
 
 %% log_dir(-Dir:string) is det
 % 
@@ -38,11 +38,31 @@ log_id(debug, 4).
 %
 % @param Data Output Target
 % @copyright 2kodevs 2019-2020
-print_log(error, FD):- write(FD, "EROR: ").
-print_log(warning, FD):- write(FD, "WARNING: ").
-print_log(info, FD):- write(FD, "INFO: ").
-print_log(debug, FD):- write(FD, "DEBUG: ").
-print_log(Data, FD):- write(FD, Data).
+print_log(error, FD) :-
+    write(FD, "ERROR: ").
+print_log(warning, FD) :-
+    write(FD, "WARNING: ").
+print_log(info, FD) :-
+    write(FD, "INFO: ").
+print_log(debug, FD) :-
+    write(FD, "DEBUG: ").
+print_log(Data:factories, FD) :-
+    findall(V, member(V:_, Data), L),
+    concat_all(L, NewData),
+    split_fac(2, 0, NewData, [], [], [Top, Bottom]),
+    length(NewData, Len),
+    make_space(7, '', S),
+    Times is Len/4,
+    print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD),
+    format_fac(1, Top, FD),
+    nl(FD),
+    format_fac(1, Bottom, FD),
+    nl(FD), !,
+    print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD), !.
+print_log(Data, FD) :-
+    write(FD, Data).
 
 %% show_logs(+List:list) is det
 % 
@@ -51,27 +71,29 @@ print_log(Data, FD):- write(FD, Data).
 %
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
-show_logs(List):-
+show_logs(List) :-
     file_descriptor(append, FD),
-    findall(1, (
-        member(Data, List),
-        print_log(Data, FD)
-    ), _),
+    findall(1,
+            ( member(Data, List),
+              print_log(Data, FD)
+            ),
+            _),
     close(FD).
 
 %% valid_log(+ModeName, +List:list) is det
 % 
 % The valid_log/2 predicate Display the data contained in 
-% List if the ModeNme is valid.
+% List if the ModeName is valid.
 %
 % @param ModeName Target mode
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
-valid_log(Mode, List):-
+valid_log(Mode, List) :-
     log_id(Mode, Id),
     log_mode(Current),
-    Current >= Id, !,
-    show_logs([Mode | List]), nl.
+    Current>=Id, !,
+    show_logs([Mode|List]),
+    nl.
 valid_log(_, _).
 
 %% error_log(+List:list) is det
@@ -80,7 +102,8 @@ valid_log(_, _).
 %
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
-error_log(List):- valid_log(error, List).
+error_log(List) :-
+    valid_log(error, List).
 
 %% warning_log(+List:list) is det
 % 
@@ -88,7 +111,8 @@ error_log(List):- valid_log(error, List).
 %
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
-warning_log(List):- valid_log(warning, List).
+warning_log(List) :-
+    valid_log(warning, List).
 
 %% info_log(+List:list) is det
 % 
@@ -96,7 +120,8 @@ warning_log(List):- valid_log(warning, List).
 %
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
-info_log(List):- valid_log(info, List).
+info_log(List) :-
+    valid_log(info, List).
 
 %% debug_log(+List:list) is det
 % 
@@ -104,7 +129,8 @@ info_log(List):- valid_log(info, List).
 %
 % @param List Outputs list
 % @copyright 2kodevs 2019-2020
-debug_log(List):- valid_log(debug, List).
+debug_log(List) :-
+    valid_log(debug, List).
 
 %% set_log_mode(+ModeName) is det
 % 
@@ -113,15 +139,21 @@ debug_log(List):- valid_log(debug, List).
 %
 % @param Dir Return the name of the current log file
 % @copyright 2kodevs 2019-2020
-set_log_mode(Mode):-
+set_log_mode(Mode) :-
     log_id(Mode, NewId),
     log_mode(Id),
     retract(log_mode(Id)),
     asserta(log_mode(NewId)), !.
-set_log_mode(Mode):- 
+set_log_mode(Mode) :-
     log_mode(Id),
     log_id(Current, Id),
-    warning_log(["Unkonwn mode <", Mode, ">. Previous mode <", Current, "> is still in use."]).
+    warning_log(
+                [ "Unkonwn mode <",
+                  Mode,
+                  ">. Previous mode <",
+                  Current,
+                  "> is still in use."
+                ]).
 
 %% file_descriptor(+Mode, -FileDescriptor) is det
 % 
@@ -131,7 +163,7 @@ set_log_mode(Mode):-
 % @param Mode File descriptor required mode
 % @param FileDescriptor An open file descriptor
 % @copyright 2kodevs 2019-2020
-file_descriptor(Mode, FD):-
+file_descriptor(Mode, FD) :-
     log_dir(Dir),
     open(Dir, Mode, FD).
 
@@ -145,4 +177,5 @@ project_info :-
     file_descriptor(write, FD),
     writeln(FD, "Azul-Game Developed by 2kodevs"),
     writeln(FD, "See us at https://github.com/2kodevs/"),
-    nl(FD), close(FD).
+    nl(FD),
+    close(FD).
