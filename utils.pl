@@ -362,7 +362,6 @@ format_fac(3, [X|Line], FD) :-
     write(FD, S),
     format_fac(3, Line, FD).
 format_fac(4, Center, FD) :-
-    nl(FD),
     write(FD, "Center:"),
     nl(FD),
     length(Center, LenC),
