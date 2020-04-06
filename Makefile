@@ -16,7 +16,7 @@ coverage: ## Run tests and display coverage
 install: ## Install dependencies
 	sudo apt-get install swi-prolog
 
-doc: ## Mount the documentation server
+doc: ## Install the documentation server
 	@echo Open the server at http://localhost:$(port)/azul/help
 	@echo Close the below process when you read the documentation
 	@swipl -g "use_module(library(http/http_path)), doc_server($(port))" -s game.pl
