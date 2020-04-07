@@ -69,7 +69,7 @@ populate(Game, Game).
 % @param NewGame The new Game ready to run a new round
 % @copyright 2kodevs 2019-2020
 new_round(Game, NewGame) :-
-    debug_log(["Prepairing a new round"]),
+    debug_log(["Preparing a new round"]),
     % Check if more tiles are needed
     populate(Game, TempGame1),
     %Select the random tiles to add
