@@ -1,4 +1,4 @@
-.PHONY : doc
+.PHONY : doc, run, test, coverage, help
 
 level 	= info
 file 	= log.log
