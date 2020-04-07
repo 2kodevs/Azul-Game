@@ -3,6 +3,7 @@
 :- include("game.pl").
 :- include("utils.pl").
 :- include("player.pl").
+:- include("logs.pl").
 
 test(use_fac, [nondet]) :-
     use_fac([[empty, empty, empty, empty], [empty, empty, empty, empty]],
@@ -71,9 +72,31 @@ test(table_score, [nondet]) :-
     assertion(R=:=29).
 
 test(new_game, [nondet]) :-
-    new_players(4, P),
-    new_game(Game),
-    assertion(Game==[P, [20:blue, 20:red, 20:yellow, 20:black, 20:white]:amounts, [0:blue, 0:red, 0:yellow, 0:black, 0:white]:outs, [[]:center, [empty, empty, empty, empty]:1, [empty, empty, empty, empty]:2, [empty, empty, empty, empty]:3, [empty, empty, empty, empty]:4, [empty, empty, empty, empty]:5, [empty, empty, empty, empty]:6, [empty, empty, empty, empty]:7, [empty, empty, empty, empty]:8, [empty, empty, empty, empty]:9]:factories]).
+    new_players(4, P:players),
+    new_game(4, 9, Game),
+    strategies(S),
+    findall(V,
+            ( member(X:_, P),
+              remove_prop(strategy, X, V)
+            ),
+            NewP),
+    property_of(players, Game, Players),
+    findall(V,
+            ( member(X:_, Players),
+              remove_prop(strategy, X, V)
+            ),
+            NewPlayers),
+    findall(1,
+            ( member(X:_, P),
+              property_of(strategy, X, St),
+              member(St, S)
+            ),
+            SP),
+    length(SP, LenSP),
+    assertion(4=:=LenSP),
+    assertion(NewPlayers==NewP),
+    remove_prop(players, Game, NewGame),
+    assertion(NewGame==[[20:blue, 20:red, 20:yellow, 20:black, 20:white]:amounts, [0:blue, 0:red, 0:yellow, 0:black, 0:white]:outs, [[]:center, [empty, empty, empty, empty]:1, [empty, empty, empty, empty]:2, [empty, empty, empty, empty]:3, [empty, empty, empty, empty]:4, [empty, empty, empty, empty]:5, [empty, empty, empty, empty]:6, [empty, empty, empty, empty]:7, [empty, empty, empty, empty]:8, [empty, empty, empty, empty]:9]:factories]).
 
 :- end_tests(game).
 
