@@ -69,7 +69,7 @@ populate(Game, Game).
 % @param NewGame The new Game ready to run a new round
 % @copyright 2kodevs 2019-2020
 new_round(Game, NewGame) :-
-    debug_log(["Prepairing a new round"]),
+    debug_log(["Preparing a new round"]),
     % Check if more tiles are needed
     populate(Game, TempGame1),
     %Select the random tiles to add
@@ -96,9 +96,9 @@ new_round(Game, NewGame) :-
             NewAmounts),
     set_prop_to(amounts, TempGame1, NewAmounts, TempGame2),
     enumerate(TempFac, 1, EnumFac),
-    set_prop_to(center, EnumFac, [], AllFac),
+    set_prop_to(center, EnumFac, [first], AllFac),
     set_prop_to(factories, TempGame2, AllFac, NewGame),
-    info_log(["Starting new round.\n\t", AllFac:factories]).
+    info_log(["Starting new round:", AllFac:factories]).
 
 %% any_full_row(+Player:Player, -Rows:Game) is semidet
 % 
@@ -191,19 +191,22 @@ table_score(P, S) :-
     full_colors(P, DS),
     S is RS*2+CS*7+10*DS.
 
-%% new_game(-Game:Game) is det
+%% new_game(+Players:int, +Factories:int, -Game:Game) is det
 % 
-% The new_game/1 predicate prepare a standard 4 player game
+% The new_game/3 predicate prepare a new game with 
+% the given number of Players and Factories
 %
+% @param Player Amount of players in the game
+% @param Factories Amount of factories in the game
 % @param Game New Game
 % @copyright 2kodevs 2019-2020
-new_game([P, A:amounts, O:outs, F:factories]) :-
+new_game(Players, Factories, [P, A:amounts, O:outs, F:factories]) :-
     tiles_colors(C),
-    new_players(4, P),
+    new_players(Players, P),
     findall(20:X, member(X, C), A),
     findall(0:X, member(X, C), O),
     add([], 4, empty, E),
-    add([], 9, E, EF),
+    add([], Factories, E, EF),
     enumerate(EF, 1, NF),
     set_prop_to(center, NF, [], F).
 
@@ -310,22 +313,35 @@ calculate_scores(Game, NewGame) :-
     findall(NewPlayer:Id,
             ( property_of(Id, Players, Player),
               table_score(Player, TableScore),
-              property_of(score, player, Score),
+              property_of(score, Player, Score),
               NewScore is Score+TableScore,
               set_prop_to(score, Player, NewScore, NewPlayer)
             ),
             NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
-
-main :-
+%% main(+Level, +File:string, +Players:int, +Factories:int) is det
+% 
+% The main/4 predicate prepare and run a new game with 
+% the given number of Players and Factories, and also
+% set the level of logguer to Level and the log file to File
+%
+% @param Level Logguer level to use
+% @param File File to store the logs
+% @param Player Amount of players in the game
+% @param Factories Amount of factories in the game
+% @param Game New Game
+% @copyright 2kodevs 2019-2020
+main(Level, File, Players, Factories) :-
+    set_log_mode(Level),
+    set_log_file(File),
     project_info,
-    info_log(["Preparing a 4 players Game"]),
-    new_game(Game),
+    info_log(["Preparing a ", Players, " players Game"]),
+    new_game(Players, Factories, Game),
     new_round(Game, NewGame),
     run(NewGame, [], EndedGame), !, 
     info_log(["The game ends. Who will be the winner??\n", EndedGame:scores]),
     writeln("true.").
-main :- 
+main(_, _, _, _) :- 
     error_log(["An unexpected failure occur"]),
     writeln("fail.").
