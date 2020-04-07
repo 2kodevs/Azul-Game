@@ -13,7 +13,7 @@ test: ## Run tests
 	@swipl -g "load_test_files([]), run_tests." -g halt -s game.pl 
  
 coverage: ## Run tests and display coverage
-	@swipl --quiet -t "use_module(library(test_cover)), load_test_files([]), show_coverage(run_tests)." -s utils.pl -s game.pl
+	@swipl -g "use_module(library(test_cover)), load_test_files([]), show_coverage(run_tests)." -g halt -s game.pl
 
 install: ## Install dependencies
 	sudo apt-get install swi-prolog
