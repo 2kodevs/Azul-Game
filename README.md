@@ -36,6 +36,19 @@ Additionally to see how to run the test suit use:
 make help
 ```
 
+## Improve the code 🛠
+To see the description of all predicates use:
+```
+make doc port=9000
+```
+The open a browser at `localhost/azul/doc:9000` and see the magic.
+
+To add a new game strategy you only need to insert its name in the strategies list. Example:
+```
+strategies([basic, greedy, ..., new_strategy]).
+```
+Then when run the game playes will use `new_strategy`.
+
 
 ## Authors ✒️
 
