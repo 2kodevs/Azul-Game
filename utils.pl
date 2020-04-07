@@ -359,8 +359,7 @@ format_fac(4, Center, FD) :-
     format_fac(3, Center, FD),
     write(FD, '|'),
     nl(FD),
-    print_symbol(NewTimes, "", +, FD),
-    nl(FD).
+    print_symbol(NewTimes, "", +, FD).
 
 %% format_cell(+List:List, +FD:File-Descriptor) is <unknown>
 % 

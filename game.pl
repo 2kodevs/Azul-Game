@@ -1,4 +1,4 @@
-:- [player, logs].
+:- [player].
 :- (dynamic initial_player/1).
 
 %% initial_player(-Id:int) is det
@@ -191,10 +191,13 @@ table_score(P, S) :-
     full_colors(P, DS),
     S is RS*2+CS*7+10*DS.
 
-%% new_game(-Game:Game) is det
+%% new_game(+Players:int, +Factories:int, -Game:Game) is det
 % 
-% The new_game/1 predicate prepare a standard 4 player game
+% The new_game/3 predicate prepare a new game with 
+% the given number of Players and Factories
 %
+% @param Player Amount of players in the game
+% @param Factories Amount of factories in the game
 % @param Game New Game
 % @copyright 2kodevs 2019-2020
 new_game(Players, Factories, [P, A:amounts, O:outs, F:factories]) :-
@@ -317,7 +320,18 @@ calculate_scores(Game, NewGame) :-
             NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
-
+%% main(+Level, +File:string, +Players:int, +Factories:int) is det
+% 
+% The main/4 predicate prepare and run a new game with 
+% the given number of Players and Factories, and also
+% set the level of logguer to Level and the log file to File
+%
+% @param Level Logguer level to use
+% @param File File to store the logs
+% @param Player Amount of players in the game
+% @param Factories Amount of factories in the game
+% @param Game New Game
+% @copyright 2kodevs 2019-2020
 main(Level, File, Players, Factories) :-
     set_log_mode(Level),
     set_log_file(File),
@@ -328,6 +342,6 @@ main(Level, File, Players, Factories) :-
     run(NewGame, [], EndedGame), !, 
     info_log(["The game ends. Who will be the winner??\n", EndedGame:scores]),
     writeln("true.").
-main(_, _) :- 
+main(_, _, _, _) :- 
     error_log(["An unexpected failure occur"]),
     writeln("fail.").
