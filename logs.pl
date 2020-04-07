@@ -33,7 +33,7 @@ log_id(debug, 4).
 
 %% print_log(+Data, +FileDescriptor) is det
 % 
-% The print_log/1 predicate write Data to FileDescriptor in the
+% The print_log/2 predicate write Data to FileDescriptor in the
 % better possible way.
 %
 % @param Data Output Target
@@ -210,11 +210,11 @@ set_log_mode(Mode) :-
 set_log_file(Dir) :-
     log_dir(OldDir),
     retract(log_dir(OldDir)),
-    asserta(log_mode(Dir)), !.
+    asserta(log_dir(Dir)), !.
 
 %% file_descriptor(+Mode, -FileDescriptor) is det
 % 
-% The file_descriptor/1 predicate return a file descriptor 
+% The file_descriptor/2 predicate return a file descriptor 
 % associated to the current log file open in Mode
 %
 % @param Mode File descriptor required mode

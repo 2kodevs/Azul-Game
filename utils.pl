@@ -1,6 +1,4 @@
-:- use_module(library(http/http_path)).
-http:location(pldoc, root('help/source'), [priority(10)]).
-:- doc_server(9000).
+http:location(pldoc, root('azul/help'), [priority(10)]).
 
 %% tiles_colors(+Colors:list) is det
 % 

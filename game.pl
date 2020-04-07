@@ -69,7 +69,7 @@ populate(Game, Game).
 % @param NewGame The new Game ready to run a new round
 % @copyright 2kodevs 2019-2020
 new_round(Game, NewGame) :-
-    debug_log(["Prepairing a new round"]),
+    debug_log(["Preparing a new round"]),
     % Check if more tiles are needed
     populate(Game, TempGame1),
     %Select the random tiles to add
@@ -197,13 +197,13 @@ table_score(P, S) :-
 %
 % @param Game New Game
 % @copyright 2kodevs 2019-2020
-new_game([P, A:amounts, O:outs, F:factories]) :-
+new_game(Players, Factories, [P, A:amounts, O:outs, F:factories]) :-
     tiles_colors(C),
-    new_players(4, P),
+    new_players(Players, P),
     findall(20:X, member(X, C), A),
     findall(0:X, member(X, C), O),
     add([], 4, empty, E),
-    add([], 9, E, EF),
+    add([], Factories, E, EF),
     enumerate(EF, 1, NF),
     set_prop_to(center, NF, [], F).
 
@@ -318,14 +318,16 @@ calculate_scores(Game, NewGame) :-
     set_prop_to(players, Game, NewPlayers, NewGame).
 
 
-main :-
+main(Level, File, Players, Factories) :-
+    set_log_mode(Level),
+    set_log_file(File),
     project_info,
-    info_log(["Preparing a 4 players Game"]),
-    new_game(Game),
+    info_log(["Preparing a ", Players, " players Game"]),
+    new_game(Players, Factories, Game),
     new_round(Game, NewGame),
     run(NewGame, [], EndedGame), !, 
     info_log(["The game ends. Who will be the winner??\n", EndedGame:scores]),
     writeln("true.").
-main :- 
+main(_, _) :- 
     error_log(["An unexpected failure occur"]),
     writeln("fail.").
