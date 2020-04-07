@@ -14,7 +14,7 @@ penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 %
 % @param Strategies Return the strategies list
 % @copyright 2kodevs 2019-2020
-strategies([basic, greedy]).
+strategies([basic, greedy, fill_column]).
 
 %% random_strategy(-Strategy:Functor) is det
 % 
@@ -101,7 +101,7 @@ valid_choices(Game, Player, Choices) :-
 
 %% available_colors(+Game:Game, -Choices:list) is det
 % 
-% The valid_choices/2 predicate given a Game find all
+% The available_colors/2 predicate given a Game find all
 % factories selections.
 %
 % @param Game A running Game
@@ -311,7 +311,7 @@ basic(Game, Player, Game, Player, none:none:none).
 %% greedy(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
 % 
 % The greedy/5 predicate is a player strategy. At the beginning find all the valid choices
-% and take the one wich maximize the score. If its not possible, then choose the tiles that
+% and take the one that maximizes the score. If its not possible, then choose the tiles that
 % minimize the penalizaton factories,  skip the turn. 
 %
 % @param Game Current Game
@@ -336,11 +336,65 @@ greedy(Game, Player, NewGame, NewPlayer, A) :-
     update_game(Game, A, NewGame, Return).
 greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     available_colors(Game, Choices), !,
-    sort(Choices, [Amount:Id:Color | _]),
+    sort(Choices, [Amount:Id:Color|_]),
     update_game(Game, none:Id:Color, NewGame, Amount),
     Neg is Amount* -1,
     penalize(Player, Neg, NewPlayer).
 greedy(Game, Player, Game, Player, none:none:none).
+
+%% fill_column(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
+% 
+% The fill_column/5 predicate is a player strategy. At the beginning find all the valid choices
+% and take the one that maximizes the score trying to complete the maximun number of full columns.
+% If its not possible, then choose the tiles that minimize the penalizaton factories,  skip the turn. 
+%
+% @param Game Current Game
+% @param Player Current Player
+% @param NewGame Updated game
+% @param NewPlayer Updated Player
+% @param Selection Player choice Line:Factory:Color
+% @copyright 2kodevs 2019-2020
+fill_column(Game, Player, NewGame, NewPlayer, A) :-
+    valid_choices(Game, Player, Choices), !,
+    log_mode(ModeId),
+    set_log_mode(warning),
+    findall(CS:Score:Choice,
+            ( member(Choice, Choices),
+              update_player(Player,
+                            Game,
+                            Choice,
+                            TempPlayer,
+                            Return),
+              property_of(table, TempPlayer, Table),
+              invert_axis(Table, ITable),
+              make_intervals(ITable, Intervals),
+              findall(V,
+                      ( member(X, Intervals),
+                        length(X, V)
+                      ),
+                      L),
+              sort(L, Column_sizes),
+              concat(_, [CS], Column_sizes),
+              property_of(score, TempPlayer, Score)
+            ),
+            Options),
+    sort(Options, Sorted),
+    concat(_, [C:_], Sorted),
+    findall(Score:Choice,
+            member(C:Score:Choice, Sorted),
+            NewOptions),
+    sort(NewOptions, NewSorted),
+    concat(_, [_:A], NewSorted),
+    set_log_mode_by_id(ModeId),
+    update_player(Player, Game, A, NewPlayer, Return),
+    update_game(Game, A, NewGame, Return).
+fill_column(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
+    available_colors(Game, Choices), !,
+    sort(Choices, [Amount:Id:Color|_]),
+    update_game(Game, none:Id:Color, NewGame, Amount),
+    Neg is Amount* -1,
+    penalize(Player, Neg, NewPlayer).
+fill_column(Game, Player, Game, Player, none:none:none).
 
 %% empty_board(+Board:Board) is det
 % 
