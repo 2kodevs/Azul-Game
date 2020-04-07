@@ -61,20 +61,6 @@ tile_score(Player,  (Row, Column), Score) :-
     line_score(InvertedAxis,  (Column, Row), ColumnScore),
     Score is RowScore+ColumnScore.
 
-%% column_of(+Line:Line, +Color, -Column:int) is det
-% 
-% The column_of/3 predicate given a line and a color return the
-% column on the player Wall
-%
-% @param Line Player line
-% @param Color Tile color
-% @param Column The column that represent this color on Line
-% @copyright 2kodevs 2019-2020
-column_of(Line, Color, Column) :-
-    tiles_colors(Colors),
-    index_of(Color, Colors, Idx),
-    Column is (Idx+Line-1)mod 5+1.
-
 %% valid_choices(+Game:Game, +Player:Player, -Choices:list) is det
 % 
 % The valid_choices/3 predicate given a Game and a Player find all

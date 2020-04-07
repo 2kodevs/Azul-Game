@@ -223,6 +223,20 @@ index_of(V, L, I) :-
     length(A, I).
 index_of(_, _, -1).
 
+%% column_of(+Line:Line, +Color, -Column:int) is det
+% 
+% The column_of/3 predicate given a line and a color return the
+% column on the player Wall
+%
+% @param Line Player line
+% @param Color Tile color
+% @param Column The column that represent this color on Line
+% @copyright 2kodevs 2019-2020
+column_of(Line, Color, Column) :-
+    tiles_colors(Colors),
+    index_of(Color, Colors, Idx),
+    Column is (Idx+Line-1)mod 5+1.
+
 %% count(+List:list, +Value, -Amount:int) is det
 % 
 % The count/3 predicate return Amount of occurences of Value in List
@@ -437,9 +451,7 @@ fill_table((X, 6), Table, Acum, [Acum|R]) :-
     fill_table((NewX, 1), Table, [], R), !.
 fill_table((X, Y), Table, Acum, R) :-
     member((X, Y), Table), !,
-    tiles_colors(Colors),
-    Index is Y-1,
-    index_of(C, Colors, Index),
+    column_of(X, C, Y),
     concat(Acum, [C], NewAcum),
     NewY is Y+1,
     fill_table((X, NewY), Table, NewAcum, R).
