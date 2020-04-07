@@ -221,7 +221,7 @@ replace(L, T, V, N, R) :-
 % @param Index The index of Value in List
 % @copyright 2kodevs 2019-2020
 index_of(V, L, I) :-
-    concat(A, [V|_], L), !,
+    concat(A, [V|_], L),
     length(A, I).
 index_of(_, _, -1).
 
@@ -267,17 +267,6 @@ indexed_sort(L, R) :-
             property_of(X, O, Y),
             R).
 
-% Maybe will never use this, not erase until job done
-split_lines(_, [], Acum, [Acum]).
-split_lines(Len, [X|Lines], Acum, SL) :-
-    length(Acum, Cur),
-    Cur<Len,
-    concat(Acum, [X], NewAcum),
-    split_lines(Len, Lines, NewAcum, SL), !.
-split_lines(Len, Lines, Acum, [Acum, B|SL]) :-
-    split_lines(Len, Lines, [], TempSL),
-    concat(B, SL, TempSL).   
-
 %% split_fac(+Row_Length:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is <unknown>
 % 
 % The split_fac/6 predicate return the elements of the factories sorted in two sides,
@@ -308,6 +297,22 @@ split_fac(Len, _, Data, Top, Bottom, [T, B]) :-
 % @param FD File descriptor for where to write
 % @copyright 2kodevs 2019-2020
 format_fac(_, [], _) :- !.
+format_fac(0, Data, FD) :-
+    split_fac(2, 0, Data, [], [], [Top, Bottom]),
+    length(Data, Len),
+    make_space(7, '', S),
+    Times is Len/4,
+    nl(FD),
+    write(FD, "Factories:"),
+    nl(FD),
+    print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD),
+    format_fac(1, Top, FD),
+    nl(FD),
+    format_fac(1, Bottom, FD),
+    nl(FD),
+    print_symbol(Times, S, ++++++++++++++++++, FD),
+    nl(FD).
 format_fac(1, [X|Line], FD) :-
     atom_string(X, SX),
     atom_length(X, Len),
@@ -335,6 +340,43 @@ format_fac(2, [X|Line], FD) :-
     write(FD, S),
     write(FD, '|  ---  '),
     format_fac(1, Line, FD).
+format_fac(3, [X|Line], FD) :-
+    atom_string(X, SX),
+    atom_length(X, Len),
+    Y is 6-Len,
+    make_space(Y, '  ', S),
+    write(FD, SX),
+    write(FD, S),
+    format_fac(3, Line, FD).
+format_fac(4, Center, FD) :-
+    write(FD, "Center:"),
+    nl(FD),
+    length(Center, LenC),
+    NewTimes is round(LenC*8+3),
+    print_symbol(NewTimes, "", +, FD),
+    nl(FD),
+    write(FD, '| '),
+    format_fac(3, Center, FD),
+    write(FD, '|'),
+    nl(FD),
+    print_symbol(NewTimes, "", +, FD),
+    nl(FD).
+
+%% format_cell(+List:List, +FD:File-Descriptor) is <unknown>
+% 
+% The format_cell/3 predicate prints a list of elements in the 
+% following format: | <item1>  <item2>  ... <itemN> |
+% 
+% @param List Elements container
+% @param FD File descriptor for where to write
+% @copyright 2kodevs 2019-2020
+format_cell([], _).
+format_cell([L|PL], FD) :-
+    write(FD, '| '),
+    format_fac(3, L, FD),
+    write(FD, '|'),
+    nl(FD),
+    format_cell(PL, FD).
 
 %% make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
 % 
@@ -367,3 +409,50 @@ print_symbol(Times, Space, Symb, FD) :-
     write(FD, Space),
     print_symbol(NewTimes, Space, Symb, FD).
 
+%% format_players(+List:List, +FD:File-Descriptor) is <unknown>
+% 
+% The format_players/3 predicate prints the score and the strategy
+% of players in List
+% 
+% @param List Elements container
+% @param FD File descriptor for where to write
+% @copyright 2kodevs 2019-2020
+format_players([], _).
+format_players([P:Score|Players], FD) :-
+    property_of(id, P, Id),
+    write(FD, 'Player '),
+    write(FD, Id),
+    write(FD, ' --- score: '),
+    write(FD, Score),
+    write(FD, ' --- strategy: '),
+    property_of(strategy, P, St),
+    write(FD, St),
+    nl(FD),
+    format_players(Players, FD).
+
+%% fill_table(+Point:(X:Int, Y:Int), +Table:List, +Acum:List, +FD:File-Descriptor) is <unknown>
+% 
+% The fill_table/4 predicate prints the score and the strategy
+% of players in List
+% 
+% @param Point Coordinate of the actual tile
+% @param Table Wall with tiles
+% @param Acum List where the elements of a row are going to be acumulated  
+% @param FD File descriptor for where to write
+% @copyright 2kodevs 2019-2020
+fill_table((6, 1), _, R, R).
+fill_table((X, 6), Table, Acum, [Acum|R]) :-
+    NewX is X+1,
+    fill_table((NewX, 1), Table, [], R), !.
+fill_table((X, Y), Table, Acum, R) :-
+    member((X, Y), Table), !,
+    tiles_colors(Colors),
+    Index is Y-1,
+    index_of(C, Colors, Index),
+    concat(Acum, [C], NewAcum),
+    NewY is Y+1,
+    fill_table((X, NewY), Table, NewAcum, R).
+fill_table((X, Y), Table, Acum, R) :-
+    concat(Acum, ['  -'], NewAcum),
+    NewY is Y+1,
+    fill_table((X, NewY), Table, NewAcum, R).    

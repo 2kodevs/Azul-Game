@@ -39,25 +39,75 @@ log_id(debug, 4).
 % @param Data Output Target
 % @param FileDescriptor File Target
 % @copyright 2kodevs 2019-2020
-print_log(error, FD):- write(FD, "ERROR: "), !.
-print_log(warning, FD):- write(FD, "WARNING: "), !.
-print_log(info, FD):- write(FD, "INFO: "), !.
-print_log(debug, FD):- write(FD, "DEBUG: "), !.
-print_log(Data:factories, FD) :-
+print_log(error, FD) :-
+    write(FD, "ERROR: "), !.
+print_log(warning, FD) :-
+    write(FD, "WARNING: "), !.
+print_log(info, FD) :-
+    write(FD, "INFO: "), !.
+print_log(debug, FD) :-
+    write(FD, "DEBUG: "), !.
+print_log(Facs:factories, FD) :-
+    property_of(center, Facs, Center),
+    remove_prop(center, Facs, Data),
     findall(V, member(V:_, Data), L),
     concat_all(L, NewData),
-    split_fac(2, 0, NewData, [], [], [Top, Bottom]),
-    length(NewData, Len),
-    make_space(7, '', S),
-    Times is Len/4,
-    print_symbol(Times, S, ++++++++++++++++++, FD),
+    format_fac(0, NewData, FD),
+    format_fac(4, Center, FD), !.
+print_log(Game:center, FD) :-
+    property_of(factories, Game, Facs),
+    property_of(center, Facs, Center),
+    format_fac(4, Center, FD).
+print_log(Player:pattern, FD) :-
     nl(FD),
-    format_fac(1, Top, FD),
+    property_of(board, Player, B),
+    findall(PL:Id,
+            ( member(X:Id, B),
+              property_of(stocks, X, Stocks),
+              Times is 5-Id,
+              add(Stocks, Times, '  -', PL)
+            ),
+            RawLines),
+    indexed_sort(RawLines, LinesSorted),
+    findall(Line, member(Line:_, LinesSorted), Lines),
+    write(FD, "               Pattern Line                "),
     nl(FD),
-    format_fac(1, Bottom, FD),
+    write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
     nl(FD),
-    print_symbol(Times, S, ++++++++++++++++++, FD), !.
-print_log(Data, FD):- write(FD, Data).
+    format_cell(Lines, FD),
+    write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"), !.
+print_log(Game:scores, FD) :-
+    property_of(players, Game, Players),
+    nl(FD),
+    findall([Id:id, Strategy:strategy]:Score,
+            ( member(X:Id, Players),
+              property_of(score, X, Score),
+              property_of(strategy, X, Strategy)
+            ),
+            PlayersInverted),
+    indexed_sort(PlayersInverted, PlayersSorted),
+    reverse(PlayersSorted, P),
+    format_players(P, FD), !.
+print_log(Data:player, FD) :-
+    property_of(player, Data, Player),
+    property_of(table, Player, RawTable),
+    sort(RawTable, Table),
+    fill_table((1, 1), Table, [], FTable),
+    nl(FD),
+    property_of(id, Data, Id),
+    string_concat("~~~~~~~~~~~~", "Player ", S1),
+    string_concat(Id, " --- Wall~~~~~~~~~~~~~~", S2),
+    string_concat(S1, S2, S3),
+    write(FD, S3),
+    nl(FD),
+    format_cell(FTable, FD),
+    write(FD, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
+    nl(FD),
+    property_of(score, Player, Score),
+    property_of(strategy, Player, St),
+    format_players([[Id:id, St:strategy]:Score], FD), !.
+print_log(Data, FD) :-
+    write(FD, Data).
 
 %% show_logs(+List:list) is det
 % 
@@ -68,11 +118,13 @@ print_log(Data, FD):- write(FD, Data).
 % @copyright 2kodevs 2019-2020
 show_logs(List) :-
     file_descriptor(append, FD),
-    findall(1, (
-        member(Data, List),
-        print_log(Data, FD)
-    ), _),
-    nl(FD), close(FD).
+    findall(1,
+            ( member(Data, List),
+              print_log(Data, FD)
+            ),
+            _),
+    nl(FD),
+    close(FD).
 
 %% valid_log(+ModeName, +List:list) is det
 % 
@@ -85,8 +137,8 @@ show_logs(List) :-
 valid_log(Mode, List) :-
     log_id(Mode, Id),
     log_mode(Current),
-    Current >= Id, !,
-    show_logs([Mode | List]).
+    Current>=Id, !,
+    show_logs([Mode|List]).
 valid_log(_, _).
 
 %% error_log(+List:list) is det
@@ -155,7 +207,7 @@ set_log_mode(Mode) :-
 %
 % @param FileDir File to use for store the logs
 % @copyright 2kodevs 2019-2020
-set_log_file(Dir):-
+set_log_file(Dir) :-
     log_dir(OldDir),
     retract(log_dir(OldDir)),
     asserta(log_dir(Dir)), !.

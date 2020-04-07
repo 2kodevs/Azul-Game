@@ -96,10 +96,9 @@ new_round(Game, NewGame) :-
             NewAmounts),
     set_prop_to(amounts, TempGame1, NewAmounts, TempGame2),
     enumerate(TempFac, 1, EnumFac),
-    set_prop_to(center, EnumFac, [ligth_green], AllFac),
+    set_prop_to(center, EnumFac, [first], AllFac),
     set_prop_to(factories, TempGame2, AllFac, NewGame),
-    % TODO: [stdevAntiD2ta] See what is happen when pass AllFac:factories, instead of AllFac in the next line
-    info_log(["Starting new round. Factories distribution:\n", AllFac]).
+    info_log(["Starting new round:", AllFac:factories]).
 
 %% any_full_row(+Player:Player, -Rows:Game) is semidet
 % 
@@ -311,7 +310,7 @@ calculate_scores(Game, NewGame) :-
     findall(NewPlayer:Id,
             ( property_of(Id, Players, Player),
               table_score(Player, TableScore),
-              property_of(score, player, Score),
+              property_of(score, Player, Score),
               NewScore is Score+TableScore,
               set_prop_to(score, Player, NewScore, NewPlayer)
             ),
