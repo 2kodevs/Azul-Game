@@ -36,11 +36,10 @@ random_strategy(S) :-
 % @copyright 2kodevs 2019-2020
 line_score(List, Tile, Score) :-
     make_intervals(List, Interval),
-    findall(X,
-            ( member(X, Interval),
-              member(Tile, X)
-            ),
-            [Adyacents]),
+    findall(X, ( 
+        member(X, Interval),
+        member(Tile, X)
+    ), [Adyacents]),
     length(Adyacents, Score).
     
 %% tile_score(+Player:Player, +Tile:point, -Score:int) is det
@@ -245,11 +244,7 @@ penalize(Player, _, Player).
 % @param ReturnedTiles Number of tiles that get out of the game
 % @copyright 2kodevs 2019-2020
 update_player(Player, Game, L:F:Color, NewPlayer, Return) :-
-    update_line(Player,
-                Game,
-                L:F:Color,
-                TempPlayer0,
-                Diff),
+    update_line(Player, Game, L:F:Color, TempPlayer0, Diff),
     column_of(L, Color, C),
     update_score(TempPlayer0,  (L, C), TempPlayer1, Amount),
     Return is Amount-Diff,
@@ -267,11 +262,10 @@ update_player(Player, Game, L:F:Color, NewPlayer, Return) :-
 update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
     property_of(factories, Game, GameFac),
     property_of(F, GameFac, Fac),
-    findall(X,
-            ( member(X, Fac),
-              not(member(X, [empty, first, C]))
-            ),
-            ToCenter),
+    findall(X, ( 
+        member(X, Fac),
+        not(member(X, [empty, first, C]))
+    ), ToCenter),
     add([], 4, empty, NewFac),
     set_prop_to(F, GameFac, NewFac, TempFacs),
     property_of(center, TempFacs, Center),
@@ -358,31 +352,23 @@ fill_column(Game, Player, NewGame, NewPlayer, A) :-
     valid_choices(Game, Player, Choices), !,
     log_mode(ModeId),
     set_log_mode(warning),
-    findall(CS:Score:Choice,
-            ( member(Choice, Choices),
-              update_player(Player,
-                            Game,
-                            Choice,
-                            TempPlayer,
-                            Return),
-              property_of(table, TempPlayer, Table),
-              invert_axis(Table, ITable),
-              make_intervals(ITable, Intervals),
-              findall(V,
-                      ( member(X, Intervals),
-                        length(X, V)
-                      ),
-                      L),
-              sort(L, Column_sizes),
-              concat(_, [CS], Column_sizes),
-              property_of(score, TempPlayer, Score)
-            ),
-            Options),
+    findall(CS:Score:Choice, ( 
+        member(Choice, Choices),
+        update_player(Player, Game, Choice, TempPlayer, Return),
+        property_of(table, TempPlayer, Table),
+        invert_axis(Table, ITable),
+        make_intervals(ITable, Intervals),
+        findall(V, ( 
+            member(X, Intervals),
+            length(X, V)
+        ), L),
+        sort(L, Column_sizes),
+        concat(_, [CS], Column_sizes),
+        property_of(score, TempPlayer, Score)
+    ), Options),
     sort(Options, Sorted),
     concat(_, [C:_], Sorted),
-    findall(Score:Choice,
-            member(C:Score:Choice, Sorted),
-            NewOptions),
+    findall(Score:Choice, member(C:Score:Choice, Sorted), NewOptions),
     sort(NewOptions, NewSorted),
     concat(_, [_:A], NewSorted),
     set_log_mode_by_id(ModeId),
@@ -406,11 +392,10 @@ empty_board(Data:board) :-
     add([], 5, 1, List),
     enumerate(List, 1, Enum),
     tiles_colors(C),
-    findall([New:stocks, C:valid, C:all]:Sz,
-            ( property_of(Sz, Enum, _),
-              add([], Sz, empty, New)
-            ),
-            Data).
+    findall([New:stocks, C:valid, C:all]:Sz, ( 
+        property_of(Sz, Enum, _),
+        add([], Sz, empty, New)
+    ), Data).
 
 %% new_players(+Amount:int, -Players:Indexed-list) is det
 % 
@@ -423,12 +408,11 @@ new_players(Amount, Players:players) :-
     empty_board(Board),
     penalization_list(Penalties),
     add([], Amount, [Board, Penalties, []:table, 0:score], List),
-    findall(P,
-            ( member(X, List),
-              random_strategy(S),
-              set_prop_to(strategy, X, S, P)
-            ),
-            RawPlayers),
+    findall(P, ( 
+        member(X, List),
+        random_strategy(S),
+        set_prop_to(strategy, X, S, P)
+    ), RawPlayers),
     enumerate(RawPlayers, 1, Players).
 
 %% run_round(+Game:Game, +Players:Indexed-list, -NewGame:Game, -Events:list) is det
@@ -445,21 +429,21 @@ run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
     info_log(["Player ", Id, " turn start --------------------"]),
     Choice=..[St, Game, P1, TempGame1, NewP1, Lid:Fid:Color],
     Choice,
-    info_log(
-             [ "Player choose all type ",
-               Color,
-               " from expositor ",
-               Fid,
-               " and add them to the ",
-               Lid,
-               " line"
-             ]),
+    info_log([ 
+        "Player choose all type ",
+        Color,
+        " from expositor ",
+        Fid,
+        " and add them to the ",
+        Lid,
+        " line"
+    ]),
     property_of(factories, TempGame1, Facs),
     debug_log([Facs:factories]),
-    info_log(
-             [ NewP1:pattern,
-               "\n----------------------------------------------"
-             ]),
+    info_log([ 
+        NewP1:pattern,
+        "\n----------------------------------------------"
+    ]),
     property_of(players, TempGame1, OldPlayers),
     set_prop_to(Id, OldPlayers, NewP1, CurPlayers),
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),
@@ -474,15 +458,14 @@ run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
 % @copyright 2kodevs 2019-2020
 clean_players(Game, NewGame) :-
     property_of(players, Game, Players),
-    findall(Player:Id,
-            ( member(X:Id, Players),
-              property_of(board, X, Board),
-              verify_lines(X, Board, CleanedPlayer),
-              info_log([[CleanedPlayer:player, Id:id]:player]),
-              penalization_list(Penalizations),
-              set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
-            ),
-            NewPlayers),
+    findall(Player:Id, ( 
+        member(X:Id, Players),
+        property_of(board, X, Board),
+        verify_lines(X, Board, CleanedPlayer),
+        info_log([[CleanedPlayer:player, Id:id]:player]),
+        penalization_list(Penalizations),
+        set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
+    ), NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
 %% verify_lines(+Player:Player, +Lines:Indexed-Lst, -NewPlayer:Player) is det

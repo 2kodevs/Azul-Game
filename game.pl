@@ -49,12 +49,11 @@ populate(Game, NewGame) :-
     property_of(outs, Game, Outs),
     debug_log(["Adding more tiles to the bag.\n\t", Amounts:amounts, "\n\t", Outs:outs]),
     % adding tiles to the bag
-    findall(RealAmount:Color,
-            ( property_of(Color, Amounts, QAmount),
-              property_of(Color, Outs, QOut),
-              RealAmount is QOut+QAmount
-            ),
-            NewAmounts),
+    findall(RealAmount:Color, ( 
+        property_of(Color, Amounts, QAmount),
+        property_of(Color, Outs, QOut),
+        RealAmount is QOut+QAmount
+    ), NewAmounts),
     set_prop_to(amounts, Game, NewAmounts, TempGame),
     % Saving that 0 tiles are out
     findall(0:Color, member(_:Color, Outs), NewOuts),
@@ -74,11 +73,10 @@ new_round(Game, NewGame) :-
     populate(Game, TempGame1),
     %Select the random tiles to add
     property_of(amounts, TempGame1, Amounts),
-    findall(List,
-            ( property_of(Color, Amounts, Quantity),
-              add([], Quantity, Color, List)
-            ),
-            ColorGroups),
+    findall(List, ( 
+        property_of(Color, Amounts, Quantity),
+        add([], Quantity, Color, List)
+    ), ColorGroups),
     concat_all(ColorGroups, ColorsList),
     random_permutation(ColorsList, ColorsOrder),
     % Saving the selected tiles
@@ -88,12 +86,11 @@ new_round(Game, NewGame) :-
     use_fac(RawFac, ColorsOrder, TempFac),
     concat_all(TempFac, UsedTiles),
     % Update the amount of tiles, and create the new game
-    findall(NewQ:Color,
-            ( property_of(Color, Amounts, QOld),
-              count(UsedTiles, Color, Used),
-              NewQ is QOld-Used
-            ),
-            NewAmounts),
+    findall(NewQ:Color, ( 
+        property_of(Color, Amounts, QOld),
+        count(UsedTiles, Color, Used),
+        NewQ is QOld-Used
+    ), NewAmounts),
     set_prop_to(amounts, TempGame1, NewAmounts, TempGame2),
     enumerate(TempFac, 1, EnumFac),
     set_prop_to(center, EnumFac, [first], AllFac),
@@ -110,13 +107,10 @@ new_round(Game, NewGame) :-
 % @copyright 2kodevs 2019-2020
 any_full_row(Player, RowsQ) :-
     property_of(table, Player, Table),
-    findall(true,
-            ( bagof(Column,
-                    member((_, Column), Table),
-                    Columns),
-              length(Columns, 5)
-            ),
-            Rows),
+    findall(true, ( 
+        bagof(Column, member((_, Column), Table), Columns),
+        length(Columns, 5)
+    ), Rows),
     length(Rows, RowsQ),
     any(Rows).
 
@@ -169,11 +163,10 @@ cascade((Row, Col), Table) :-
 % @copyright 2kodevs 2019-2020
 full_colors(Player, Amount) :-
     property_of(table, Player, Table),
-    findall(true,
-            ( member((1, Col), Table),
-              cascade((1, Col), Table)
-            ),
-            List),
+    findall(true, ( 
+        member((1, Col), Table),
+        cascade((1, Col), Table)
+    ), List),
     length(List, Amount).    
 
 %% table_score(+Player:Player, -Score:int) is det
@@ -310,14 +303,13 @@ end_or_continue(Game, Events, NewGame) :-
 % @copyright 2kodevs 2019-2020
 calculate_scores(Game, NewGame) :-
     property_of(players, Game, Players),
-    findall(NewPlayer:Id,
-            ( property_of(Id, Players, Player),
-              table_score(Player, TableScore),
-              property_of(score, Player, Score),
-              NewScore is Score+TableScore,
-              set_prop_to(score, Player, NewScore, NewPlayer)
-            ),
-            NewPlayers),
+    findall(NewPlayer:Id, ( 
+        property_of(Id, Players, Player),
+        table_score(Player, TableScore),
+        property_of(score, Player, Score),
+        NewScore is Score+TableScore,
+        set_prop_to(score, Player, NewScore, NewPlayer)
+    ), NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
 %% main(+Level, +File:string, +Players:int, +Factories:int) is det

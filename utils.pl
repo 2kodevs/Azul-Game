@@ -187,9 +187,7 @@ set_prop_to(P, O, V, N) :-
 % @param Result Points inverted list
 % @copyright 2kodevs 2019-2020
 invert_axis(L, R) :-
-    findall((Y, X),
-            member((X, Y), L),
-            R).
+    findall((Y, X), member((X, Y), L), R).
 
 %% replace(+List:list, +Amount:int, +Value, +NewValue, -Result:list) is det
 % 
@@ -259,13 +257,9 @@ enumerate([E1|List], Number, [E1:Number|Enum]) :-
 % @param Result Elements Ordered by index
 % @copyright 2kodevs 2019-2020
 indexed_sort(L, R) :-
-    findall(X:Y,
-            property_of(X, L, Y),
-            I),
+    findall(X:Y, property_of(X, L, Y), I),
     sort(I, O),
-    findall(X:Y,
-            property_of(X, O, Y),
-            R).
+    findall(X:Y, property_of(X, O, Y), R).
 
 %% split_fac(+Row_Length:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is <unknown>
 % 
@@ -303,8 +297,7 @@ format_fac(0, Data, FD) :-
     make_space(7, '', S),
     Times is Len/4,
     nl(FD),
-    write(FD, "Factories:"),
-    nl(FD),
+    write(FD, "Factories:\n"),
     print_symbol(Times, S, ++++++++++++++++++, FD),
     nl(FD),
     format_fac(1, Top, FD),
@@ -349,8 +342,7 @@ format_fac(3, [X|Line], FD) :-
     write(FD, S),
     format_fac(3, Line, FD).
 format_fac(4, Center, FD) :-
-    write(FD, "Center:"),
-    nl(FD),
+    write(FD, "Center:\n"),
     length(Center, LenC),
     NewTimes is round(LenC*8+3),
     print_symbol(NewTimes, "", +, FD),
