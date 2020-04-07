@@ -321,12 +321,12 @@ basic(Game, Player, Game, Player, none:none:none).
 % @param Selection Player choice Line:Factory:Color
 % @copyright 2kodevs 2019-2020
 greedy(Game, Player, NewGame, NewPlayer, A) :-
-    valid_choices(Game, Player, Choises), !,
+    valid_choices(Game, Player, Choices), !,
     log_mode(ModeId),
     set_log_mode(warning),
-    findall(Score:Choise, (
-        member(Choise, Choises),
-        update_player(Player, Game, Choise, TempPlayer, _),
+    findall(Score:Choice, (
+        member(Choice, Choices),
+        update_player(Player, Game, Choice, TempPlayer, _),
         property_of(score, TempPlayer, Score)    
     ), Options),
     sort(Options, Sorted),
@@ -335,8 +335,8 @@ greedy(Game, Player, NewGame, NewPlayer, A) :-
     update_player(Player, Game, A, NewPlayer, Return),
     update_game(Game, A, NewGame, Return).
 greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
-    available_colors(Game, Choises), !,
-    sort(Choises, [Amount:Id:Color | _]),
+    available_colors(Game, Choices), !,
+    sort(Choices, [Amount:Id:Color | _]),
     update_game(Game, none:Id:Color, NewGame, Amount),
     Neg is Amount* -1,
     penalize(Player, Neg, NewPlayer).
