@@ -1,4 +1,4 @@
-:- [player, logs].
+:- [player].
 :- (dynamic initial_player/1).
 
 %% initial_player(-Id:int) is det

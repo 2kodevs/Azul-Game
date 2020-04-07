@@ -454,7 +454,7 @@ run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
                Lid,
                " line"
              ]),
-    property_of(factories, Game, Facs),
+    property_of(factories, TempGame1, Facs),
     debug_log([Facs:factories]),
     info_log(
              [ NewP1:pattern,
