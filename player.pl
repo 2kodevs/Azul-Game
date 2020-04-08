@@ -119,43 +119,44 @@ clean_line(Player, L, NewPlayer) :-
     property_of(stocks, Line, CurStocks),
     % cheking that the line is full
     add([], L, C, CurStocks),
-    concat(A, [C|B], Colors),
+    concat(A, [C | B], Colors),
     concat(A, B, List),
     set_prop_to(all, Line, List, TempLine0),
     set_prop_to(valid, TempLine0, List, TempLine1),
+    % update the player
+    column_of(L, C, Column),
+    update_score(Player, (L, Column), TempPlayer),
     % cleaning the line
     add([], L, empty, Stocks),
     set_prop_to(stocks, TempLine1, Stocks, TempLine2),
     set_prop_to(L, Board, TempLine2, NewBoard),
-    set_prop_to(board, Player, NewBoard, NewPlayer).
+    set_prop_to(board, TempPlayer, NewBoard, NewPlayer).
 
-%% update_score(+Player:Player, +Tile:point, -NewPlayer:Player, -ReturnedTiles:int) is det
+%% update_score(+Player:Player, +Tile:point, -NewPlayer:Player) is det
 % 
-% The update_score/4 predicate update the player score after try to add Tile
+% The update_score/3 predicate update the player score after try to add Tile
 % to his Wall.
 %
 % @param Player Target
 % @param Tile New tile attempt
 % @param NewPlayer Updated player
-% @param ReturnedTiles Number of tiles that get out of the game
 % @copyright 2kodevs 2019-2020
-update_score(Player,  (L, C), NewPlayer, Return) :-
+update_score(Player,  (L, C), NewPlayer) :-
     property_of(board, Player, Board),
     property_of(L, Board, Line),
     property_of(stocks, Line, Stocks),
+    % trace,
     count(Stocks, empty, 0), !,
-    info_log(["Player fulfilled the row ", L, " of his pattern lines"]),
-    Return is L-1,
     tile_score(Player,  (L, C), Score),
     property_of(score, Player, PScore),
     Sum is Score+PScore,
     update_table(Player,  (L, C), CurPlayer),
     set_prop_to(score, CurPlayer, Sum, NewPlayer).
-update_score(P, _, P, 0).
+update_score(P, _, P).
 
-%% update_line(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -ReturnedTiles:int) is det
+%% update_line(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -OutTiles:int, -LineTiles:int) is det
 % 
-% The update_line/5 predicate update the pattern line of Player. The id of the line is 
+% The update_line/6 predicate update the pattern line of Player. The id of the line is 
 % given on selection in the form <L:F:Color> where L is the line Id, F is a factory Id, and
 % Color is the color selected from F. Update the line following the game rules.
 %
@@ -163,9 +164,10 @@ update_score(P, _, P, 0).
 % @param Game Current Game
 % @param Selection Tuple Line:Factory:Color
 % @param NewPlayer Updated player
-% @param ReturnedTiles Number of tiles that get out of the game by overflow of the stock size
+% @param OutTiles Number of tiles that get out of the game due to penalizations
+% @param LineTiles Number of tiles that get out of the game due to pattern line
 % @copyright 2kodevs 2019-2020
-update_line(Player, Game, L:F:Color, NewPlayer, Diff) :-
+update_line(Player, Game, L:F:Color, NewPlayer, Diff, Tiles) :-
     property_of(factories, Game, Factories),
     property_of(F, Factories, Fac),
     property_of(board, Player, Board),
@@ -173,8 +175,10 @@ update_line(Player, Game, L:F:Color, NewPlayer, Diff) :-
     property_of(stocks, Line, Stocks),
     count(Stocks, empty, Empty),
     count(Fac, Color, Amount),
-    Diff is min(Empty-Amount, 0),
     replace(Stocks, Amount, empty, Color, NewStocks),
+    count(NewStocks, empty, NewEmpty),
+    Diff is min(Empty-Amount, 0),
+    Tiles is (min(NewEmpty - 1, 0) * -(L - 1)),
     debug_log(["Player new pattern line ", L, " is -> ", NewStocks]),
     set_prop_to(stocks, Line, NewStocks, NewLine),
     set_prop_to(valid, NewLine, [Color], ValidLine),
@@ -219,22 +223,24 @@ penalize(Player, Amount, NewPlayer) :-
     penalize(TempPlayer2, Times, NewPlayer).
 penalize(Player, _, Player).    
 
-%% update_player(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -ReturnedTiles:int) is det
+%% update_player(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -ReturnedTiles:int, -FinalPlayer:Player) is det
 % 
-% The update_player/5 predicate update all the player information after a new choice
+% The update_player/6 predicate update all the player information after a new choice
 %
 % @param Player Target
 % @param Game Current Game
 % @param Selection Tuple Line:Factory:Color
 % @param NewPlayer Updated player
 % @param ReturnedTiles Number of tiles that get out of the game
+% @param FinalPlayer Player with the Wall updated
 % @copyright 2kodevs 2019-2020
-update_player(Player, Game, L:F:Color, NewPlayer, Return) :-
-    update_line(Player, Game, L:F:Color, TempPlayer0, Diff),
-    column_of(L, Color, C),
-    update_score(TempPlayer0,  (L, C), TempPlayer1, Amount),
+update_player(Player, Game, L:F:Color, NewPlayer, Return, FinalPlayer) :-
+    update_line(Player, Game, L:F:Color, TempPlayer0, Diff, Amount),
+    debug_log([TempPlayer0:pattern]),
+    property_of(board, TempPlayer0, Board),
+    verify_lines(TempPlayer0, Board:unsorted, FinalPlayer),
     Return is Amount-Diff,
-    penalize(TempPlayer1, Diff, NewPlayer).
+    penalize(TempPlayer0, Diff, NewPlayer).
 
 %% update_game(+Game:Game, +Selection, -NewGame:Game, +ReturnedTiles:int) is det
 % 
@@ -279,7 +285,7 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
 % @copyright 2kodevs 2019-2020
 basic(Game, Player, NewGame, NewPlayer, A) :-
     valid_choices(Game, Player, [A|_]), !,
-    update_player(Player, Game, A, NewPlayer, Return),
+    update_player(Player, Game, A, NewPlayer, Return, _),
     update_game(Game, A, NewGame, Return).
 basic(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     available_colors(Game, [Amount:Id:Color | _]), !,
@@ -306,13 +312,13 @@ greedy(Game, Player, NewGame, NewPlayer, A) :-
     set_log_mode(warning),
     findall(Score:Choice, (
         member(Choice, Choices),
-        update_player(Player, Game, Choice, TempPlayer, _),
+        update_player(Player, Game, Choice, _, _, TempPlayer),
         property_of(score, TempPlayer, Score)    
     ), Options),
     sort(Options, Sorted),
     concat(_, [_:A], Sorted),
     set_log_mode_by_id(ModeId),
-    update_player(Player, Game, A, NewPlayer, Return),
+    update_player(Player, Game, A, NewPlayer, Return, _),
     update_game(Game, A, NewGame, Return).
 greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     available_colors(Game, Choices), !,
@@ -340,7 +346,7 @@ fill_column(Game, Player, NewGame, NewPlayer, A) :-
     set_log_mode(warning),
     findall(CS:Score:Choice, ( 
         member(Choice, Choices),
-        update_player(Player, Game, Choice, TempPlayer, Return),
+        update_player(Player, Game, Choice, _, Return, TempPlayer),
         property_of(table, TempPlayer, Table),
         invert_axis(Table, ITable),
         make_intervals(ITable, Intervals),
@@ -358,7 +364,7 @@ fill_column(Game, Player, NewGame, NewPlayer, A) :-
     sort(NewOptions, NewSorted),
     concat(_, [_:A], NewSorted),
     set_log_mode_by_id(ModeId),
-    update_player(Player, Game, A, NewPlayer, Return),
+    update_player(Player, Game, A, NewPlayer, Return, _),
     update_game(Game, A, NewGame, Return).
 fill_column(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     available_colors(Game, Choices), !,
@@ -447,7 +453,7 @@ clean_players(Game, NewGame) :-
     findall(Player:Id, ( 
         member(X:Id, Players),
         property_of(board, X, Board),
-        verify_lines(X, Board, CleanedPlayer),
+        verify_lines(X, Board:unsorted, CleanedPlayer),
         info_log([[CleanedPlayer:player, Id:id]:player]),
         penalization_list(Penalizations),
         set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
@@ -468,3 +474,6 @@ verify_lines(Player, [_:Line|Lines], NewPlayer) :-
     verify_lines(CurPlayer, Lines, NewPlayer).
 verify_lines(Player, [_|Lines], NewPlayer) :-
     verify_lines(Player, Lines, NewPlayer).
+verify_lines(Player, Lines:unsorted, NewPlayer) :-
+    indexed_sort(Lines, Sorted),
+    verify_lines(Player, Sorted, NewPlayer).
