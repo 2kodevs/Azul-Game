@@ -1,4 +1,16 @@
-:- [player].
+:- module(game, [
+    use_fac/3,
+    populate/2,
+    any_full_row/2,
+    full_rows/2,
+    cascade/2,
+    full_colors/2,
+    ending_condition/1,
+    table_score/2,
+    new_game/3
+]).
+
+:- use_module([utils, logs, player]).
 :- (dynamic initial_player/1).
 
 %% initial_player(-Id:int) is det

@@ -1,4 +1,16 @@
-:- [utils, logs].
+:- module(player, [
+    penalize/3,
+    new_players/2,
+    run_round/4,
+    clean_players/2,
+    empty_board/1,
+    penalization_list/1,
+    tile_score/3,
+    line_score/3,
+    strategies/1
+]).
+
+:- use_module([utils, logs]).
 
 %% penalization_list(-Penalizations:list) is det
 % 

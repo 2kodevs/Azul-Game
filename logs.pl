@@ -1,4 +1,17 @@
-:- [utils].
+:- module(logs, [
+    log_mode/1,
+    log_id/2,
+    error_log/1,
+    debug_log/1,
+    info_log/1,
+    warning_log/1,
+    set_log_mode/1,
+    set_log_mode_by_id/1,
+    set_log_file/1,
+    project_info/0
+]).
+
+:- use_module(utils).
 :- (dynamic log_dir/1).
 :- (dynamic log_mode/1).
 

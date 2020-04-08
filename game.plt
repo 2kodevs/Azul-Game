@@ -1,9 +1,6 @@
 :- begin_tests(game).
 
-:- include("game.pl").
-:- include("utils.pl").
-:- include("player.pl").
-:- include("logs.pl").
+:- use_module([utils, logs, player, game]).
 
 test(use_fac, [nondet]) :-
     use_fac([[empty, empty, empty, empty], [empty, empty, empty, empty]],

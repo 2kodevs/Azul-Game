@@ -1,7 +1,6 @@
 :- begin_tests(utils).
 
-:- include("utils.pl").
-
+:- use_module(utils).
 
 test(add, [nondet]) :-
     add([], 5, red, R),

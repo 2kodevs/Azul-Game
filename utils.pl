@@ -1,3 +1,27 @@
+:- module(utils, [
+    tiles_colors/1,
+    concat/3,
+    add/4,
+    concat_all/2,
+    any/1,
+    make_intervals/2,
+    property_of/3,
+    get_value_or_default/4,
+    remove_prop/3,
+    set_prop_to/4,
+    invert_axis/2,
+    replace/5,
+    index_of/3,
+    column_of/3,
+    count/3,
+    enumerate/3,
+    indexed_sort/2,
+    format_fac/3,
+    format_players/2,
+    format_cell/2,
+    fill_table/4
+]).
+
 http:location(pldoc, root('azul/help'), [priority(10)]).
 
 %% tiles_colors(+Colors:list) is det
