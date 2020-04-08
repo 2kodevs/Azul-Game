@@ -61,7 +61,8 @@ print_log(Game:center, FD) :-
 print_log(Player:pattern, FD) :-
     nl(FD),
     property_of(board, Player, B),
-    findall(PL:Id, ( member(X:Id, B),
+    findall(PL:Id, ( 
+        member(X:Id, B),
         property_of(stocks, X, Stocks),
         Times is 5-Id,
         add(Stocks, Times, '  -', PL)
