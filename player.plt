@@ -1,7 +1,6 @@
 :- begin_tests(player).
 
-:- include("utils.pl").
-:- include("player.pl").
+:- use_module([utils, player]).
 
 test(line_score, [nondet]) :-
     line_score([(1, 2),  (2, 3),  (1, 1),  (2, 5),  (2, 4),  (3, 4),  (1, 4)],  (2, 4), Score),
