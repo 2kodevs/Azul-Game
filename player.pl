@@ -12,7 +12,9 @@
 
 :- use_module([utils, logs]).
 
-%% penalization_list(-Penalizations:list) is det
+http:location(pldoc, root('azul/help'), [priority(10)]).
+
+%! penalization_list(-Penalizations:list) is det
 % 
 % The penalization_list/1 fact return the order of penalization values 
 %
@@ -20,7 +22,7 @@
 % @copyright 2kodevs 2019-2020
 penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 
-%% strategies(-Strategies:list) is det
+%! strategies(-Strategies:list) is det
 % 
 % The strategies/1 fact return the list of strategies that a player can select
 %
@@ -28,7 +30,7 @@ penalization_list([-1, -1, -2, -2, -2, -3, -3]:penalties).
 % @copyright 2kodevs 2019-2020
 strategies([basic, greedy, fill_column]).
 
-%% random_strategy(-Strategy:Functor) is det
+%! random_strategy(-Strategy:Functor) is det
 % 
 % The random_strategy/1 predicate return a random play strategy 
 %
@@ -38,7 +40,7 @@ random_strategy(S) :-
     strategies(St),
     random_permutation(St, [S|_]).    
 
-%% line_score(+List:list, +Tile:point, -Score:int) is det
+%! line_score(+List:list, +Tile:point, -Score:int) is det
 % 
 % The line_score/3 predicate find the score of add Tile to a row of table
 %
@@ -54,7 +56,7 @@ line_score(List, Tile, Score) :-
     ), [Adyacents]),
     length(Adyacents, Score).
     
-%% tile_score(+Player:Player, +Tile:point, -Score:int) is det
+%! tile_score(+Player:Player, +Tile:point, -Score:int) is det
 % 
 % The tile_score/3 predicate calculate the score of add Tile to the
 % player Wall
@@ -73,7 +75,7 @@ tile_score(Player,  (Row, Column), Score) :-
     line_score(InvertedAxis,  (Column, Row), ColumnScore),
     Score is RowScore+ColumnScore.
 
-%% valid_choices(+Game:Game, +Player:Player, -Choices:list) is det
+%! valid_choices(+Game:Game, +Player:Player, -Choices:list) is det
 % 
 % The valid_choices/3 predicate given a Game and a Player find all
 % choices that aument the tiles in the pattern lines of Player
@@ -96,7 +98,7 @@ valid_choices(Game, Player, Choices) :-
     ), Choices),
     not(length(Choices, 0)).    
 
-%% available_colors(+Game:Game, -Choices:list) is det
+%! available_colors(+Game:Game, -Choices:list) is det
 % 
 % The available_colors/2 predicate given a Game find all
 % factories selections.
@@ -114,7 +116,7 @@ available_colors(Game, Choices) :-
     ), Choices),
     not(length(Choices, 0)).  
 
-%% clean_line(+Player:Player, +LineId:int, -NewPlayer:Player) is semidet
+%! clean_line(+Player:Player, +LineId:int, -NewPlayer:Player) is semidet
 % 
 % The clean_line/3 predicate if the line numbered LineId of the player 
 % pattern lines is full, it becomes an empty line.
@@ -144,7 +146,7 @@ clean_line(Player, L, NewPlayer) :-
     set_prop_to(L, Board, TempLine2, NewBoard),
     set_prop_to(board, TempPlayer, NewBoard, NewPlayer).
 
-%% update_score(+Player:Player, +Tile:point, -NewPlayer:Player) is det
+%! update_score(+Player:Player, +Tile:point, -NewPlayer:Player) is det
 % 
 % The update_score/3 predicate update the player score after try to add Tile
 % to his Wall.
@@ -166,7 +168,7 @@ update_score(Player,  (L, C), NewPlayer) :-
     set_prop_to(score, CurPlayer, Sum, NewPlayer).
 update_score(P, _, P).
 
-%% update_line(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -OutTiles:int, -LineTiles:int) is det
+%! update_line(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -OutTiles:int, -LineTiles:int) is det
 % 
 % The update_line/6 predicate update the pattern line of Player. The id of the line is 
 % given on selection in the form <L:F:Color> where L is the line Id, F is a factory Id, and
@@ -197,7 +199,7 @@ update_line(Player, Game, L:F:Color, NewPlayer, Diff, Tiles) :-
     set_prop_to(L, Board, ValidLine, NewBoard),
     set_prop_to(board, Player, NewBoard, NewPlayer).
 
-%% update_table(+Player:Player, +Tile:point, -NewPlayer:Player) is det
+%! update_table(+Player:Player, +Tile:point, -NewPlayer:Player) is det
 % 
 % The update_table/3 predicate add a tile to the player board
 %
@@ -211,7 +213,7 @@ update_table(Player, Tile, NewPlayer) :-
     add(Table, 1, Tile, NewTable),
     set_prop_to(table, Player, NewTable, NewPlayer).
 
-%% penalize(+Player:Player, +Amount:int, -NewPlayer:Player) is det
+%! penalize(+Player:Player, +Amount:int, -NewPlayer:Player) is det
 % 
 % The penalize/3 predicate add an Amount number of penalizations to Player using
 % its penalization property.
@@ -235,7 +237,7 @@ penalize(Player, Amount, NewPlayer) :-
     penalize(TempPlayer2, Times, NewPlayer).
 penalize(Player, _, Player).    
 
-%% update_player(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -ReturnedTiles:int, -FinalPlayer:Player) is det
+%! update_player(+Player:Player, +Game:Game, +Selection, -NewPlayer:Player, -ReturnedTiles:int, -FinalPlayer:Player) is det
 % 
 % The update_player/6 predicate update all the player information after a new choice
 %
@@ -256,7 +258,7 @@ update_player(Player, Game, L:F:Color, NewPlayer, Return, FinalPlayer) :-
     Return is Amount-Diff,
     penalize(TempPlayer0, Diff, NewPlayer).
 
-%% update_game(+Game:Game, +Selection, -NewGame:Game, +ReturnedTiles:int) is det
+%! update_game(+Game:Game, +Selection, -NewGame:Game, +ReturnedTiles:int) is det
 % 
 % The update_game/4 predicate update all the game information after a player turn
 %
@@ -285,7 +287,7 @@ update_game(Game, _:F:C, NewGame, ReturnedTiles) :-
     set_prop_to(C, Outs, Sum, NewOuts),
     set_prop_to(outs, Temp, NewOuts, NewGame).
 
-%% basic(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
+%! basic(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
 % 
 % The basic/5 predicate is a player strategy. At the beginning find all the valid choices
 % and take the first. If its not possible to choose any tile, and if there is no tile left in the
@@ -308,7 +310,7 @@ basic(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     penalize(Player, Neg, NewPlayer).
 basic(Game, Player, Game, Player, none:none:none).
 
-%% greedy(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
+%! greedy(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
 % 
 % The greedy/5 predicate is a player strategy. At the beginning find all the valid choices
 % and take the one that maximizes the score. If its not possible, then choose the tiles that
@@ -342,7 +344,7 @@ greedy(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     penalize(Player, Neg, NewPlayer).
 greedy(Game, Player, Game, Player, none:none:none).
 
-%% fill_column(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
+%! fill_column(+Game:Game, +Player:Player, -NewGame:Game, -NewPlayer:Player, -Selection:int) is det
 % 
 % The fill_column/5 predicate is a player strategy. At the beginning find all the valid choices
 % and take the one that maximizes the score trying to complete the maximun number of full columns.
@@ -388,7 +390,7 @@ fill_column(Game, Player, NewGame, NewPlayer, none:Id:Color) :-
     penalize(Player, Neg, NewPlayer).
 fill_column(Game, Player, Game, Player, none:none:none).
 
-%% empty_board(+Board:Board) is det
+%! empty_board(+Board:Board) is det
 % 
 % The empty_board/1 predicate create a new player board
 %
@@ -403,7 +405,7 @@ empty_board(Data:board) :-
         add([], Sz, empty, New)
     ), Data).
 
-%% new_players(+Amount:int, -Players:Indexed-list) is det
+%! new_players(+Amount:int, -Players:Indexed-list) is det
 % 
 % The new_players/2 predicate create an Amount of new players
 %
@@ -421,7 +423,7 @@ new_players(Amount, Players:players) :-
     ), RawPlayers),
     enumerate(RawPlayers, 1, Players).
 
-%% run_round(+Game:Game, +Players:Indexed-list, -NewGame:Game, -Events:list) is det
+%! run_round(+Game:Game, +Players:Indexed-list, -NewGame:Game, -Events:list) is det
 % 
 % The run_round/4 predicate run a turn for each player and return the list of 
 % events relative to each one of their choices.
@@ -455,7 +457,7 @@ run_round(Game, [P1:Id|Players], NewGame, [Id:Fid|Events]) :-
     set_prop_to(players, TempGame1, CurPlayers, TempGame2),
     run_round(TempGame2, Players, NewGame, Events).
 
-%% clean_players(+Game:Game, -NewGame:Game) is det
+%! clean_players(+Game:Game, -NewGame:Game) is det
 % 
 % The clean_players/2 predicate clean the pattern lines fulfilled of each player.
 %
@@ -477,7 +479,7 @@ clean_players(Game, NewGame) :-
     ), NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
-%% verify_lines(+Player:Player, +Lines:Indexed-Lst, -NewPlayer:Player) is det
+%! verify_lines(+Player:Player, +Lines:Indexed-Lst, -NewPlayer:Player) is det
 % 
 % The verify_lines/3 predicate clean fulfilled lines in Lines belonging to Player.
 %

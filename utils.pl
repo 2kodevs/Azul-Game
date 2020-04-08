@@ -24,7 +24,7 @@
 
 http:location(pldoc, root('azul/help'), [priority(10)]).
 
-%% tiles_colors(+Colors:list) is det
+%! tiles_colors(+Colors:list) is det
 % 
 % The tiles_colors/1 fact return the game tile colors 
 %
@@ -32,7 +32,7 @@ http:location(pldoc, root('azul/help'), [priority(10)]).
 % @copyright 2kodevs 2019-2020
 tiles_colors([blue, red, yellow, black, white]).
 
-%% concat(+List1:list, +List2:list, -Result:list) is det
+%! concat(+List1:list, +List2:list, -Result:list) is det
 % 
 % The concat/3 predicate return the concatenation of List1 and List2
 % in Result 
@@ -45,7 +45,7 @@ concat([], X, X).
 concat([X|R], Y, [X|Z]) :-
     concat(R, Y, Z).
 
-%% add(+List:list, +Amount:list, +Element, -Result:list) is det
+%! add(+List:list, +Amount:list, +Element, -Result:list) is det
 % 
 % The add/4 predicate return the concatenation of Amount occurences
 % of Element at the end of List 
@@ -62,7 +62,7 @@ add(L, K, X, R) :-
     concat(L, [X], L1),
     add(L1, P, X, R).
 
-%% list_print(+List:list) is det
+%! list_print(+List:list) is det
 % 
 % The list_print/1 predicate print the List element in lines 
 % separated by newline 
@@ -74,7 +74,7 @@ list_print([X|L]) :-
     writeln(X),
     list_print(L).
 
-%% isList(+Object) is det
+%! isList(+Object) is det
 % 
 % The isList/1 fact return if Object is a list 
 % separated by newline 
@@ -84,7 +84,7 @@ list_print([X|L]) :-
 isList([]).
 isList([_|_]).
 
-%% concat_all(+List:list, -Result:list) is det
+%! concat_all(+List:list, -Result:list) is det
 % 
 % The concat_all/2 predicate return the concatenation of all list elements of List
 %
@@ -96,7 +96,7 @@ concat_all([X|Y], R) :-
     concat_all(Y, L),
     concat(X, L, R).
 
-%% any(+Object) is semidet
+%! any(+Object) is semidet
 % 
 % The any/1 predicate return true if Object is true, or is a list that contains any true
 %
@@ -107,7 +107,7 @@ any(L) :-
     isList(L),
     member(true, L).
 
-%% consecutive(+List:list, +Point:point, -Consecutive:list, -Others:list) is det
+%! consecutive(+List:list, +Point:point, -Consecutive:list, -Others:list) is det
 % 
 % The consecutive/4 predicate split the List in two parts. The elements consecutive
 % in the two Point line, and the rest of them.
@@ -123,7 +123,7 @@ consecutive([(X, B)|L],  (X, Y), C, R) :-
     concat([(X, B)], A, C).
 consecutive(L, _, [], L).
 
-%% blocks(+List:list, -Blocks:list) is det
+%! blocks(+List:list, -Blocks:list) is det
 % 
 % The blocks/2 predicate return a set of list that represent the 
 % groups of elements that are consecutive in List. See consecutive/2
@@ -138,7 +138,7 @@ blocks([X|L], I) :-
     blocks(R, K),
     concat([B], K, I).
 
-%% make_intervals(+List:list, -Intervals:list) is det
+%! make_intervals(+List:list, -Intervals:list) is det
 % 
 % The make_intervals/2 predicate return the Blocks of List after a sort operation
 % 
@@ -150,7 +150,7 @@ make_intervals(L, I) :-
     sort(L, S),
     blocks(S, I).
 
-%% property_of(+Property, +Object:list, -Value) is nondet
+%! property_of(+Property, +Object:list, -Value) is nondet
 % 
 % The property_of/3 predicate return Value of an Object Property
 % 
@@ -161,7 +161,7 @@ make_intervals(L, I) :-
 property_of(P, O, V) :-
     member(V:P, O).
 
-%% get_value_or_default(+Property, +Object:list, -Value, +Default) is multi
+%! get_value_or_default(+Property, +Object:list, -Value, +Default) is multi
 % 
 % The get_value_or_default/4 predicate is a wrapper for
 % property_of/3 the same value when it succeeds and Default when it fails
@@ -175,7 +175,7 @@ get_value_or_default(P, O, V, _) :-
     property_of(P, O, V).
 get_value_or_default(_, _, D, D).
 
-%% remove_prop(+Property, +Object:list, -NewObject:list) is det
+%! remove_prop(+Property, +Object:list, -NewObject:list) is det
 % 
 % The remove_prop/3 predicate remove a property of an object
 % 
@@ -190,7 +190,7 @@ remove_prop(P, [X:Y|R], [X:Y|L]) :-
     Y\=P,
     remove_prop(P, R, L).
 
-%% set_prop_to(+Property, +Object:list, +Value, -NewObject:list) is det
+%! set_prop_to(+Property, +Object:list, +Value, -NewObject:list) is det
 % 
 % The set_prop_to/4 predicate set the value of an Object property
 % 
@@ -203,7 +203,7 @@ set_prop_to(P, O, V, N) :-
     remove_prop(P, O, C),
     concat([V:P], C, N).
 
-%% invert_axis(+List:list, -Result:list) is det
+%! invert_axis(+List:list, -Result:list) is det
 % 
 % The invert_axis/2 predicate invert the coordinates of all points of List
 % 
@@ -213,7 +213,7 @@ set_prop_to(P, O, V, N) :-
 invert_axis(L, R) :-
     findall((Y, X), member((X, Y), L), R).
 
-%% replace(+List:list, +Amount:int, +Value, +NewValue, -Result:list) is det
+%! replace(+List:list, +Amount:int, +Value, +NewValue, -Result:list) is det
 % 
 % The replace/5 predicate change the first Amount occurences of Value in List
 % to NewValue
@@ -234,7 +234,7 @@ replace(L, T, V, N, R) :-
     replace(B, Z, V, N, K),
     concat(A, [N|K], R).
 
-%% index_of(+Value, +List:list, -Index:int) is multi
+%! index_of(+Value, +List:list, -Index:int) is multi
 % 
 % The index_of/3 predicate return the index of Value in List
 % 
@@ -247,7 +247,7 @@ index_of(V, L, I) :-
     length(A, I).
 index_of(_, _, -1).
 
-%% column_of(+Line:Line, +Color, -Column:int) is det
+%! column_of(+Line:Line, +Color, -Column:int) is det
 % 
 % The column_of/3 predicate given a line and a color return the
 % column on the player Wall
@@ -261,7 +261,7 @@ column_of(Line, Color, Column) :-
     index_of(Color, Colors, Idx),
     Column is (Idx+Line-1)mod 5+1.
 
-%% count(+List:list, +Value, -Amount:int) is det
+%! count(+List:list, +Value, -Amount:int) is det
 % 
 % The count/3 predicate return Amount of occurences of Value in List
 % 
@@ -273,7 +273,7 @@ count(L, V, R) :-
     findall(1, member(V, L), K),
     length(K, R).   
 
-%% enumerate(+List:list, +Start:int, -Result:Index-List) is det
+%! enumerate(+List:list, +Start:int, -Result:Index-List) is det
 % 
 % The enumerate/3 predicate return the List with its elements enumerated from Start
 % to N, where N is Start + length of List
@@ -287,7 +287,7 @@ enumerate([E1|List], Number, [E1:Number|Enum]) :-
     Next is Number+1,
     enumerate(List, Next, Enum).
 
-%% indexed_sort(+List:Index-List, -Result:Index-List) is det
+%! indexed_sort(+List:Index-List, -Result:Index-List) is det
 % 
 % The indexed_sort/2 predicate return List sorted by its indexes
 % 
@@ -299,7 +299,7 @@ indexed_sort(L, R) :-
     sort(I, O),
     findall(X:Y, property_of(X, O, Y), R).
 
-%% split_fac(+Row_Length:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is <unknown>
+%! split_fac(+Row_Length:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is <unknown>
 % 
 % The split_fac/6 predicate return the elements of the factories sorted in two sides,
 % an upper and bottom one, for displaying purposes
@@ -320,7 +320,7 @@ split_fac(Len, Cur, [X|Data], Acum, Buttom, R) :-
 split_fac(Len, _, Data, Top, Bottom, [T, B]) :-
     split_fac(Len, 0, Data, Bottom, Top, [B, T]).
 
-%% format_fac(+Mode:Int, +List:List, +FD:File-Descriptor) is <unknown>
+%! format_fac(+Mode:Int, +List:List, +FD:File-Descriptor) is <unknown>
 % 
 % The format_fac/3 predicate prints the factories
 % 
@@ -391,7 +391,7 @@ format_fac(4, Center, FD) :-
     nl(FD),
     print_symbol(NewTimes, "", +, FD).
 
-%% format_cell(+List:List, +FD:File-Descriptor) is <unknown>
+%! format_cell(+List:List, +FD:File-Descriptor) is <unknown>
 % 
 % The format_cell/3 predicate prints a list of elements in the 
 % following format: | <item1>  <item2>  ... <itemN> |
@@ -407,7 +407,7 @@ format_cell([L|PL], FD) :-
     nl(FD),
     format_cell(PL, FD).
 
-%% make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
+%! make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
 % 
 % The make_space/3 predicate return the result of concatenating the blank space ''
 % Times times to Initial_Separator
@@ -422,7 +422,7 @@ make_space(Times, Acum, S) :-
     string_concat(Acum, ' ', NewAcum),
     make_space(NewTimes, NewAcum, S).
 
-%% print_symbol(+Times:Int, +Separator:String, +Symbol:String, +FD:File-Descriptor) is <unknown>
+%! print_symbol(+Times:Int, +Separator:String, +Symbol:String, +FD:File-Descriptor) is <unknown>
 % 
 % The print_symbol/4 predicate prints to FD Symbol Times times separated by Separator
 % 
@@ -438,7 +438,7 @@ print_symbol(Times, Space, Symb, FD) :-
     write(FD, Space),
     print_symbol(NewTimes, Space, Symb, FD).
 
-%% format_players(+List:List, +FD:File-Descriptor) is <unknown>
+%! format_players(+List:List, +FD:File-Descriptor) is <unknown>
 % 
 % The format_players/3 predicate prints the score and the strategy
 % of players in List
@@ -459,7 +459,7 @@ format_players([P:Score|Players], FD) :-
     nl(FD),
     format_players(Players, FD).
 
-%% fill_table(+Point:(X:Int, Y:Int), +Table:List, +Acum:List, +FD:File-Descriptor) is <unknown>
+%! fill_table(+Point:(X:Int, Y:Int), +Table:List, +Acum:List, +FD:File-Descriptor) is <unknown>
 % 
 % The fill_table/4 predicate prints the score and the strategy
 % of players in List

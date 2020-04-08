@@ -7,13 +7,16 @@
     full_colors/2,
     ending_condition/1,
     table_score/2,
-    new_game/3
+    new_game/3,
+    main/4
 ]).
 
 :- use_module([utils, logs, player]).
 :- (dynamic initial_player/1).
 
-%% initial_player(-Id:int) is det
+http:location(pldoc, root('azul/help'), [priority(10)]).
+
+%! initial_player(-Id:int) is det
 % 
 % The initial_player/1 fact store the id 
 % of the player who is the first to play in the current
@@ -23,7 +26,7 @@
 % @copyright 2kodevs 2019-2020
 initial_player(1).
 
-%% use_fac(+EmptyFactories:list, +Tiles:list, -FullFactories) is det
+%! use_fac(+EmptyFactories:list, +Tiles:list, -FullFactories) is det
 % 
 % The use_fac/3 predicate given a set of factories  
 % fill each one following the order of the
@@ -41,7 +44,7 @@ use_fac([[]|Factories], Tiles, [[]|Result]) :-
 use_fac([[_|Fac1]|Factories], [Tile1|Tiles], [[Tile1|Res1]|Result]) :-
     use_fac([Fac1|Factories], Tiles, [Res1|Result]).
 
-%% populate(+Game:Game, -NewGame:Game) is det
+%! populate(+Game:Game, -NewGame:Game) is det
 % 
 % The populate/2 predicate try to ensure that all
 % the factories in Game will be full at the beginning
@@ -72,7 +75,7 @@ populate(Game, NewGame) :-
     set_prop_to(outs, TempGame, NewOuts, NewGame).
 populate(Game, Game).
 
-%% new_round(+Game:Game, -NewGame:Game) is multi
+%! new_round(+Game:Game, -NewGame:Game) is multi
 % 
 % The new_round/2 predicate prepare the Game before the start of a new round.
 %
@@ -109,7 +112,7 @@ new_round(Game, NewGame) :-
     set_prop_to(factories, TempGame2, AllFac, NewGame),
     info_log(["Starting new round:", AllFac:factories]).
 
-%% any_full_row(+Player:Player, -Rows:Game) is semidet
+%! any_full_row(+Player:Player, -Rows:Game) is semidet
 % 
 % The any_full_row/2 predicate check if the player have any full row
 % in his Wall.
@@ -126,7 +129,7 @@ any_full_row(Player, RowsQ) :-
     length(Rows, RowsQ),
     any(Rows).
 
-%% ending_condition(+Game:Game) is semidet
+%! ending_condition(+Game:Game) is semidet
 % 
 % The ending_condition/1 predicate check if the Game ends.
 %
@@ -137,7 +140,7 @@ ending_condition(Game) :-
     member(X:_, P),
     any_full_row(X, _).
     
-%% full_rows(+Player:Player, -Rows:Game) is det
+%! full_rows(+Player:Player, -Rows:Game) is det
 % 
 % The full_rows/2 predicate is a wrapper for any_full_row/2
 % that return 0 when that function fails
@@ -149,7 +152,7 @@ full_rows(Player, RowsQ) :-
     any_full_row(Player, RowsQ), !.
 full_rows(_, 0).
 
-%% cascade(+Tile:Point, +Table:list) is det
+%! cascade(+Tile:Point, +Table:list) is det
 % 
 % The cascade/2 predicate check if all the tiles of the
 % same color of Tile below it are in Table
@@ -165,7 +168,7 @@ cascade((Row, Col), Table) :-
     NewCol is max((Col+1)mod 6, 1),
     cascade((NewRow, NewCol), Table).
 
-%% full_colors(+Player:Player, -Amount:int) is det
+%! full_colors(+Player:Player, -Amount:int) is det
 % 
 % The full_colors/2 predicate count the number of full colors in
 % the Player Wall
@@ -181,7 +184,7 @@ full_colors(Player, Amount) :-
     ), List),
     length(List, Amount).    
 
-%% table_score(+Player:Player, -Score:int) is det
+%! table_score(+Player:Player, -Score:int) is det
 % 
 % The table_score/2 predicate calculate the score of a player Wall
 %
@@ -196,7 +199,7 @@ table_score(P, S) :-
     full_colors(P, DS),
     S is RS*2+CS*7+10*DS.
 
-%% new_game(+Players:int, +Factories:int, -Game:Game) is det
+%! new_game(+Players:int, +Factories:int, -Game:Game) is det
 % 
 % The new_game/3 predicate prepare a new game with 
 % the given number of Players and Factories
@@ -215,7 +218,7 @@ new_game(Players, Factories, [P, A:amounts, O:outs, F:factories]) :-
     enumerate(EF, 1, NF),
     set_prop_to(center, NF, [], F).
 
-%% order_players(+Game:Game, -Players:list) is det
+%! order_players(+Game:Game, -Players:list) is det
 % 
 % The order_players/2 predicate return the players in the round order
 %
@@ -227,7 +230,7 @@ order_players(Game, NewPlayers) :-
     indexed_sort(Players, OriginalOrder),
     sort_players(OriginalOrder, NewPlayers).
 
-%% sort_players(+Players:list, -NewPlayers:list) is det
+%! sort_players(+Players:list, -NewPlayers:list) is det
 % 
 % The sort_players/2 predicate return the players ordered from 1 to N, 
 % where N is the number of players.
@@ -240,7 +243,7 @@ sort_players(Players, NewPlayers) :-
     concat(A, [Player:Pid|B], Players),
     concat([Player:Pid|B], A, NewPlayers).
 
-%% run(+Game:Game, +Events:list, -NewGame:Game) is det
+%! run(+Game:Game, +Events:list, -NewGame:Game) is det
 % 
 % The run/3 predicate run the Game until it ends, given a list of 
 % previous occured selection that players did in the current round.
@@ -255,7 +258,7 @@ run(Game, Events, NewGame) :-
     concat(Events, CurEvents, NewEvents),
     validate(TempGame, NewEvents, NewGame).
 
-%% validate(+Game:Game, +Events:list, -NewGame:Game) is det
+%! validate(+Game:Game, +Events:list, -NewGame:Game) is det
 % 
 % The validate/3 predicate check if the Game current round end, 
 % start a new one if needed, and continue running the Game.
@@ -275,7 +278,7 @@ validate(Game, Events, NewGame) :-
 validate(Game, Events, NewGame) :-
     run(Game, Events, NewGame).
 
-%% end_or_continue(+Game:Game, +Events:list, -NewGame:Game) is det
+%! end_or_continue(+Game:Game, +Events:list, -NewGame:Game) is det
 % 
 % The end_or_continue/3 predicate check if the Game ends and calculate the scores, 
 % or continue running the game.
@@ -306,7 +309,7 @@ end_or_continue(Game, Events, NewGame) :-
     new_round(TempGame1, TempGame2),
     run(TempGame2, [], NewGame).
 
-%% calculate_scores(+Game:Game, -NewGame:Game) is det
+%! calculate_scores(+Game:Game, -NewGame:Game) is det
 % 
 % The calculate_scores/2 predicate calculate the final score of each Game player 
 %
@@ -324,7 +327,7 @@ calculate_scores(Game, NewGame) :-
     ), NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
-%% main(+Level, +File:string, +Players:int, +Factories:int) is det
+%! main(+Level, +File:string, +Players:int, +Factories:int) is det
 % 
 % The main/4 predicate prepare and run a new game with 
 % the given number of Players and Factories, and also
