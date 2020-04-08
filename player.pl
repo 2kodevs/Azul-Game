@@ -217,7 +217,7 @@ penalize(Player, Amount, NewPlayer) :-
     debug_log(["Player recive ", P1, " of penalization"]),
     set_prop_to(penalties, Player, R, TempPlayer1),
     property_of(score, Player, Score),
-    NewScore is max(Score+P1, 0),
+    NewScore is Score+P1,
     set_prop_to(score, TempPlayer1, NewScore, TempPlayer2),
     Times is Amount+1,
     penalize(TempPlayer2, Times, NewPlayer).
@@ -236,9 +236,11 @@ penalize(Player, _, Player).
 % @copyright 2kodevs 2019-2020
 update_player(Player, Game, L:F:Color, NewPlayer, Return, FinalPlayer) :-
     update_line(Player, Game, L:F:Color, TempPlayer0, Diff, Amount),
-    debug_log([TempPlayer0:pattern]),
     property_of(board, TempPlayer0, Board),
+    log_mode(ModeId),
+    set_log_mode(warning),
     verify_lines(TempPlayer0, Board:unsorted, FinalPlayer),
+    set_log_mode_by_id(ModeId),
     Return is Amount-Diff,
     penalize(TempPlayer0, Diff, NewPlayer).
 
@@ -456,7 +458,10 @@ clean_players(Game, NewGame) :-
         verify_lines(X, Board:unsorted, CleanedPlayer),
         info_log([[CleanedPlayer:player, Id:id]:player]),
         penalization_list(Penalizations),
-        set_prop_to(penalization, CleanedPlayer, Penalizations, Player)
+        set_prop_to(penalization, CleanedPlayer, Penalizations, NewPlayer),
+        property_of(score, NewPlayer, CurScore),
+        Score is max(CurScore, 0),
+        set_prop_to(score, NewPlayer, Score, Player)
     ), NewPlayers),
     set_prop_to(players, Game, NewPlayers, NewGame).
 
