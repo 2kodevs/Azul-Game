@@ -299,12 +299,12 @@ indexed_sort(L, R) :-
     sort(I, O),
     findall(X:Y, property_of(X, O, Y), R).
 
-%! split_fac(+Row_Length:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is <unknown>
+%! split_fac(+RowLength:Int, +Current:Int, +List:List, +Top:List, +Bottom:List, -Result:List) is det
 % 
 % The split_fac/6 predicate return the elements of the factories sorted in two sides,
 % an upper and bottom one, for displaying purposes
 % 
-% @param Row_Length Length of the row of a single factory
+% @param RowLength Length of the row of a single factory
 % @param Current Starting index of the row
 % @param List Elements of all factories concatenated
 % @param Top List where the elements of the upper side of the print are going to be acumulated  
@@ -320,7 +320,7 @@ split_fac(Len, Cur, [X|Data], Acum, Buttom, R) :-
 split_fac(Len, _, Data, Top, Bottom, [T, B]) :-
     split_fac(Len, 0, Data, Bottom, Top, [B, T]).
 
-%! format_fac(+Mode:Int, +List:List, +FD:File-Descriptor) is <unknown>
+%! format_fac(+Mode:Int, +List:List, +FD:File-Descriptor) is det
 % 
 % The format_fac/3 predicate prints the factories
 % 
@@ -391,9 +391,9 @@ format_fac(4, Center, FD) :-
     nl(FD),
     print_symbol(NewTimes, "", +, FD).
 
-%! format_cell(+List:List, +FD:File-Descriptor) is <unknown>
+%! format_cell(+List:List, +FD:File-Descriptor) is det
 % 
-% The format_cell/3 predicate prints a list of elements in the 
+% The format_cell/2 predicate prints a list of elements in the 
 % following format: | <item1>  <item2>  ... <itemN> |
 % 
 % @param List Elements container
@@ -407,7 +407,7 @@ format_cell([L|PL], FD) :-
     nl(FD),
     format_cell(PL, FD).
 
-%! make_space(+Times:Int, +Initial_Separator:String, -Result:String) is <unknown>
+%! make_space(+Times:Int, +Initial_Separator:String, -Result:String) is det
 % 
 % The make_space/3 predicate return the result of concatenating the blank space ''
 % Times times to Initial_Separator
@@ -422,7 +422,7 @@ make_space(Times, Acum, S) :-
     string_concat(Acum, ' ', NewAcum),
     make_space(NewTimes, NewAcum, S).
 
-%! print_symbol(+Times:Int, +Separator:String, +Symbol:String, +FD:File-Descriptor) is <unknown>
+%! print_symbol(+Times:Int, +Separator:String, +Symbol:String, +FD:File-Descriptor) is det
 % 
 % The print_symbol/4 predicate prints to FD Symbol Times times separated by Separator
 % 
@@ -438,9 +438,9 @@ print_symbol(Times, Space, Symb, FD) :-
     write(FD, Space),
     print_symbol(NewTimes, Space, Symb, FD).
 
-%! format_players(+List:List, +FD:File-Descriptor) is <unknown>
+%! format_players(+List:List, +FD:File-Descriptor) is det
 % 
-% The format_players/3 predicate prints the score and the strategy
+% The format_players/2 predicate prints the score and the strategy
 % of players in List
 % 
 % @param List Elements container
@@ -459,7 +459,7 @@ format_players([P:Score|Players], FD) :-
     nl(FD),
     format_players(Players, FD).
 
-%! fill_table(+Point:(X:Int, Y:Int), +Table:List, +Acum:List, +FD:File-Descriptor) is <unknown>
+%! fill_table(+Point:(X:Int, Y:Int), +Table:List, +Acum:List, +FD:File-Descriptor) is det
 % 
 % The fill_table/4 predicate prints the score and the strategy
 % of players in List
