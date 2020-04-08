@@ -159,7 +159,6 @@ update_score(Player,  (L, C), NewPlayer) :-
     property_of(board, Player, Board),
     property_of(L, Board, Line),
     property_of(stocks, Line, Stocks),
-    % trace,
     count(Stocks, empty, 0), !,
     tile_score(Player,  (L, C), Score),
     property_of(score, Player, PScore),
