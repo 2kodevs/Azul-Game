@@ -62,7 +62,7 @@ Then when run the game playes will use `new_strategy`.
 
 ## Authors ✒️
 
-- **Lazaro Raul Iglesias Vera** -- [stdevRulo](https://github.com/stdevRulo)
+- **Lazaro Raul Iglesias Vera** -- [e1Ru1o](https://github.com/e1Ru1o)
 - **Miguel Tenorio Potrony** - [AntiD2ta](https://github.com/AntiD2ta)
 
 ## License 📄
